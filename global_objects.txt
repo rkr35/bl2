@@ -1,4 +1,2 @@
-8B 0D E0 25 B2 01 8B 3C 81 8B B5 94 EE FF FF 56 8B CF
-I = Find(8B 0D ? ? ? ? 8B 3C 81 8B B5 94 EE FF FF 56 8B CF)
+I = Find(8B 0D ? ? ? ? 8B 3C 81 8B B5)
 Global_Objects = *(u32*)(I + 2)
-
