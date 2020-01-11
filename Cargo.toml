@@ -9,6 +9,8 @@ edition = "2018"
 [lib]
 crate-type = ["cdylib"]
 
+[workspace]
+
 [dependencies]
 bl2_macros = { path = "bl2_macros" }
 winapi = { version = "0.3", features = [
