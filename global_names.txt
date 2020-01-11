@@ -1,0 +1,2 @@
+I = Find(8B 0D ? ? ? ? 83 3C 81 ? 74)
+Global_Names = *(u32*)(I + 2)
