@@ -9,6 +9,16 @@ edition = "2018"
 [lib]
 crate-type = ["cdylib"]
 
+[profile.dev]
+panic = 'unwind'
+
+[profile.release]
+panic = 'unwind'
+lto = true
+codegen-units = 1
+debug = 0
+incremental = true
+
 [workspace]
 
 [dependencies]
