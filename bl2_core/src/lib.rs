@@ -1,3 +1,5 @@
+#![warn(clippy::pedantic)]
+
 use log::info;
 
 pub fn idle() {
