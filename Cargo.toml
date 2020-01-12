@@ -20,6 +20,7 @@ panic = 'unwind'
 debug = 0
 
 [workspace]
+members = ["bl2_sdk_gen"]
 
 [dependencies]
 bl2_core = { path = "bl2_core" }
