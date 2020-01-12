@@ -22,7 +22,10 @@ incremental = true
 [workspace]
 
 [dependencies]
+bl2_core = { path = "bl2_core" }
 bl2_macros = { path = "bl2_macros" }
+log = "0.4"
+simplelog = "0.7"
 winapi = { version = "0.3", features = [
     "consoleapi",
     "minwindef",
