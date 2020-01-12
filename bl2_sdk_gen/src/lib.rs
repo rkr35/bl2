@@ -1,7 +1,7 @@
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
+#![warn(clippy::pedantic)]
+
+use bl2_macros::main;
+
+main! {
+    bl2_core::idle();
 }

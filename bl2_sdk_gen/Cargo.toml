@@ -6,4 +6,21 @@ edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[lib]
+crate-type = ["cdylib"]
+
 [dependencies]
+bl2_core = { path = "../bl2_core" }
+bl2_macros = { path = "../bl2_macros" }
+log = "0.4"
+simplelog = "0.7"
+wchar = "0.6"
+winapi = { version = "0.3", features = [
+    "consoleapi",
+    "minwindef",
+    "libloaderapi",
+    "processthreadsapi",
+    "wincon",
+    "winnt",
+    "winuser",
+]}
