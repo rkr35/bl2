@@ -17,6 +17,7 @@ pub fn main(input: OldTokenStream) -> OldTokenStream {
 
         extern "system" fn on_attach(dll: LPVOID) -> DWORD {
             use simplelog::{Config, LevelFilter, TermLogger, TerminalMode};
+            use std::panic;
             use winapi::{
                 um::{
                     consoleapi::AllocConsole,
@@ -24,22 +25,30 @@ pub fn main(input: OldTokenStream) -> OldTokenStream {
                     wincon::FreeConsole,
                 }
             };
-
-            unsafe {
-                AllocConsole();
-            }
             
-            println!("Allocated console.");
+            let result = panic::catch_unwind(|| {
+                unsafe {
+                    AllocConsole();
+                }
+                
+                println!("Allocated console.");
 
-            let filter = LevelFilter::Info;
-            let config = Config::default();
-            let mode = TerminalMode::Mixed;
-            if let Err(e) = TermLogger::init(filter, config, mode) {
-                eprintln!("Failed to initialize TermLogger: {}", e);
+                let filter = LevelFilter::Info;
+                let config = Config::default();
+                let mode = TerminalMode::Mixed;
+                if let Err(e) = TermLogger::init(filter, config, mode) {
+                    eprintln!("Failed to initialize TermLogger: {}", e);
+                    bl2_core::idle();
+                } else {
+                    log::info!("Initialized logger.");
+                    #input
+                }
+            });
+
+            if let Err(panic) = result {
+                log::error!("on_attach() caught a panic. The state of the hook \
+                    is unknown. The hook will now detach.");
                 bl2_core::idle();
-            } else {
-                log::info!("Initialized logger.");
-                #input
             }
 
             unsafe {
