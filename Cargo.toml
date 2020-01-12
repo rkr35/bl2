@@ -26,6 +26,7 @@ bl2_core = { path = "bl2_core" }
 bl2_macros = { path = "bl2_macros" }
 log = "0.4"
 simplelog = "0.7"
+wchar = "0.6"
 winapi = { version = "0.3", features = [
     "consoleapi",
     "minwindef",
@@ -33,4 +34,5 @@ winapi = { version = "0.3", features = [
     "processthreadsapi",
     "wincon",
     "winnt",
+    "winuser",
 ]}
