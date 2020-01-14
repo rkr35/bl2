@@ -25,35 +25,37 @@ impl Display for WinApiErrorCode {
 }
 
 macro_rules! winapi {
-    ($call:expr) => {{
+    ($function:expr, $($arg:tt)*) => {{
         const SUCCESS: u32 = 0;
+
+        unsafe fn you_must_wrap_the_macro_in_unsafe() {}
+        you_must_wrap_the_macro_in_unsafe();
 
         // Set this thread's last-error value to a known success state so that
         // we can later query the error-code after a winapi call to determine
         // whether failure occurred.
-        unsafe { SetLastError(SUCCESS); }
+        SetLastError(SUCCESS);
 
-        let ret = || $call;
-        let ret = ret();
+        let ret = ($function) ($($arg)*);
 
-        let error_code = unsafe { GetLastError() };
+        let error_code = GetLastError();
 
         if error_code == SUCCESS {
             Ok(ret)
         } else {
             Err(WinApiErrorCode::from(error_code))
         }
-    }}
+    }};
 }
 
 #[derive(Error, Debug)]
 pub enum Error {
-    #[error("Module not found. Are you sure it's running and that the name \
-        is correctly spelled? GetLastError() == {0}")]
-    ModuleNotFound(WinApiErrorCode),
+    #[error("Failed to get module handle. Are you sure it's running and that \
+        the name is correctly spelled? GetLastError() == {0}")]
+    GetModuleHandleFailed(WinApiErrorCode),
 
     #[error("Failed to get module information. GetLastError() == {0}")]
-    FailedToGetModuleInformation(WinApiErrorCode),
+    GetModuleInformationFailed(WinApiErrorCode),
 }
 
 struct Module {
@@ -69,10 +71,8 @@ pub struct PatternFinder {
 
 impl PatternFinder {
     pub fn new(module_name: &[u16]) -> Result<Self, Error> {
-
-        let module = winapi!(unsafe { GetModuleHandleW(module_name.as_ptr()) });
-        let module = module.map_err(Error::ModuleNotFound)?;
-
+        let module = unsafe { winapi!(GetModuleHandleW, module_name.as_ptr()) };
+        let module = module.map_err(Error::GetModuleHandleFailed)?;
         todo!();
     }
 
