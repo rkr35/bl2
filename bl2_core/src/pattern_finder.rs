@@ -1,9 +1,18 @@
+use core::convert::TryFrom;
 use core::fmt::{self, Display};
+use core::mem::{MaybeUninit, size_of};
+use core::num;
+use log::info;
 use thiserror::Error;
 use winapi::{
     um::{
-        libloaderapi::GetModuleHandleW,
         errhandlingapi::{GetLastError, SetLastError},
+        libloaderapi::GetModuleHandleW,
+        processthreadsapi::GetCurrentProcess,
+        psapi::{
+            GetModuleInformation,
+            MODULEINFO as ModuleInfo,
+        },
     },
 };
 
@@ -56,24 +65,62 @@ pub enum Error {
 
     #[error("Failed to get module information. GetLastError() == {0}")]
     GetModuleInformationFailed(WinApiErrorCode),
+
+    #[error("Attempted lossy integer cast when trying to convert {action} to \
+        {dest_type}. The source value is {source_value}, but the destination \
+        type \"{dest_type}\" only has a range of [{min}, {max}].")]
+    LossyIntCast {
+        action: &'static str,
+        source_value: String,
+        dest_type: &'static str,
+        min: String,
+        max: String,
+    }
 }
 
-struct Module {
-    start: usize,
-    end: usize,
+macro_rules! try_int_cast {
+    ($from:expr, $to:ty, $action:literal) => {{
+        <$to>::try_from($from)
+            .map_err(|_| Error::LossyIntCast {
+                action: $action,
+                source_value: ($from).to_string(),
+                dest_type: stringify!($to),
+                min: <$to>::min_value().to_string(),
+                max: <$to>::max_value().to_string(),
+            })
+    }}
 }
 
 pub type Pattern = ();
 
 pub struct PatternFinder {
-    module: Module,
+    start: usize,
+    end: usize,
 }
 
 impl PatternFinder {
     pub fn new(module_name: &[u16]) -> Result<Self, Error> {
         let module = unsafe { winapi!(GetModuleHandleW, module_name.as_ptr()) };
         let module = module.map_err(Error::GetModuleHandleFailed)?;
-        todo!();
+        let process = unsafe { GetCurrentProcess() };
+        let mut module_info = MaybeUninit::<ModuleInfo>::uninit();
+        let module_info_size = try_int_cast!(size_of::<ModuleInfo>(), u32, 
+            "size of ModuleInfo from usize")?;
+        unsafe {
+            let module_info = module_info.as_mut_ptr();
+            winapi!(GetModuleInformation, process, module, module_info,
+                module_info_size).map_err(Error::GetModuleInformationFailed)?;
+        }
+        let module_info = unsafe { module_info.assume_init() };
+        let start = module_info.lpBaseOfDll as usize;
+        let size = try_int_cast!(module_info.SizeOfImage, usize,
+            "size of module from DWORD")?;
+        let end = start + size;
+        info!("[{:#x}, {:#x}) is {:#x} bytes.", start, end, size);
+        Ok(Self {
+            start,
+            end,
+        })
     }
 
     pub fn find<T>(&self, pattern: Pattern) -> Option<&'static mut T> {
