@@ -5,6 +5,7 @@ use core::num;
 use log::info;
 use thiserror::Error;
 use winapi::{
+    shared::minwindef::HMODULE as Module,
     um::{
         errhandlingapi::{GetLastError, SetLastError},
         libloaderapi::GetModuleHandleW,
@@ -13,8 +14,11 @@ use winapi::{
             GetModuleInformation,
             MODULEINFO as ModuleInfo,
         },
+        winnt::HANDLE,
     },
 };
+
+type Process = HANDLE;
 
 #[derive(Debug)]
 pub struct WinApiErrorCode {
@@ -98,23 +102,34 @@ pub struct PatternFinder {
     end: usize,
 }
 
+fn get_module(name: &[u16]) -> Result<Module, Error> {
+    let module = unsafe { winapi!(GetModuleHandleW, name.as_ptr()) };
+    module.map_err(Error::GetModuleHandleFailed)
+}
+
+fn get_module_info(name: &[u16]) -> Result<ModuleInfo, Error> {
+    let module = get_module(name)?;
+    let process = unsafe { GetCurrentProcess() };
+    
+    let mut module_info = MaybeUninit::<ModuleInfo>::uninit();
+    let module_info_size = try_int_cast!(size_of::<ModuleInfo>(), u32, 
+        "size of ModuleInfo")?;
+
+    unsafe {
+        let module_info = module_info.as_mut_ptr();
+        winapi!(GetModuleInformation, process, module, module_info,
+            module_info_size).map_err(Error::GetModuleInformationFailed)?;
+    }
+
+    Ok(unsafe { module_info.assume_init() })
+}
+
 impl PatternFinder {
     pub fn new(module_name: &[u16]) -> Result<Self, Error> {
-        let module = unsafe { winapi!(GetModuleHandleW, module_name.as_ptr()) };
-        let module = module.map_err(Error::GetModuleHandleFailed)?;
-        let process = unsafe { GetCurrentProcess() };
-        let mut module_info = MaybeUninit::<ModuleInfo>::uninit();
-        let module_info_size = try_int_cast!(size_of::<ModuleInfo>(), u32, 
-            "size of ModuleInfo from usize")?;
-        unsafe {
-            let module_info = module_info.as_mut_ptr();
-            winapi!(GetModuleInformation, process, module, module_info,
-                module_info_size).map_err(Error::GetModuleInformationFailed)?;
-        }
-        let module_info = unsafe { module_info.assume_init() };
+        let module_info = get_module_info(module_name)?;
         let start = module_info.lpBaseOfDll as usize;
         let size = try_int_cast!(module_info.SizeOfImage, usize,
-            "size of module from DWORD")?;
+            "size of module")?;
         let end = start + size;
         info!("[{:#x}, {:#x}) is {:#x} bytes.", start, end, size);
         Ok(Self {
