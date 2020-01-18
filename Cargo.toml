@@ -14,9 +14,9 @@ panic = 'unwind'
 
 [profile.release]
 panic = 'unwind'
-#lto = true
-#codegen-units = 1
-#incremental = true
+lto = 'fat'
+codegen-units = 1
+incremental = true
 debug = 0
 
 [workspace]
