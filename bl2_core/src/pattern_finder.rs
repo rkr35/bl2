@@ -1,65 +1,19 @@
 use core::convert::TryFrom;
-use core::fmt::{self, Display};
 use core::mem::{MaybeUninit, size_of};
-use core::num;
+use crate::{winapi, winapi_helpers::{WinApiErrorCode}};
 use log::info;
 use thiserror::Error;
-use winapi::{
+use ::winapi::{
     shared::minwindef::HMODULE as Module,
     um::{
-        errhandlingapi::{GetLastError, SetLastError},
         libloaderapi::GetModuleHandleW,
         processthreadsapi::GetCurrentProcess,
         psapi::{
             GetModuleInformation,
             MODULEINFO as ModuleInfo,
         },
-        winnt::HANDLE,
     },
 };
-
-type Process = HANDLE;
-
-#[derive(Debug)]
-pub struct WinApiErrorCode {
-    error: u32,
-}
-
-impl From<u32> for WinApiErrorCode {
-    fn from(error: u32) -> Self {
-        Self { error }
-    }
-}
-
-impl Display for WinApiErrorCode {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        self.error.fmt(f)
-    }
-}
-
-macro_rules! winapi {
-    ($function:expr, $($arg:tt)*) => {{
-        const SUCCESS: u32 = 0;
-
-        unsafe fn you_must_wrap_the_macro_in_unsafe() {}
-        you_must_wrap_the_macro_in_unsafe();
-
-        // Set this thread's last-error value to a known success state so that
-        // we can later query the error-code after a winapi call to determine
-        // whether failure occurred.
-        SetLastError(SUCCESS);
-
-        let ret = ($function) ($($arg)*);
-
-        let error_code = GetLastError();
-
-        if error_code == SUCCESS {
-            Ok(ret)
-        } else {
-            Err(WinApiErrorCode::from(error_code))
-        }
-    }};
-}
 
 #[derive(Error, Debug)]
 pub enum Error {
@@ -95,7 +49,10 @@ macro_rules! try_int_cast {
     }}
 }
 
-pub type Pattern = ();
+pub enum Byte {
+    Wildcard,
+    Literal(u8),
+}
 
 pub struct PatternFinder {
     start: usize,
@@ -143,7 +100,7 @@ impl PatternFinder {
         })
     }
 
-    pub fn find<T>(&self, pattern: Pattern) -> Option<&'static mut T> {
+    pub fn find<T>(&self, _pattern: &[Byte]) -> Option<&'static mut T> {
         todo!();
     }
 }

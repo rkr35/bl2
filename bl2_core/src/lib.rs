@@ -3,8 +3,10 @@
 
 use log::info;
 
+pub mod winapi_helpers;
+
 mod pattern_finder;
-pub use pattern_finder::{Pattern, PatternFinder};
+pub use pattern_finder::{Byte, PatternFinder};
 
 pub fn idle() {
     use std::io::{self, Read};
