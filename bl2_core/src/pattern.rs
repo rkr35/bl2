@@ -35,7 +35,7 @@ pub enum Error {
         max: String,
     },
 
-    #[error("Overflow on addition when calculating end-of-module address.\
+    #[error("Overflow on addition when calculating end of module address.\
         start = {start}, size = {size}")]
     OverflowEndOfModule {
         start: usize,
