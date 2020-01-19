@@ -127,11 +127,16 @@ fn get_module_info(name: &[u16]) -> Result<ModuleInfo, Error> {
 impl PatternFinder {
     pub fn new(module_name: &[u16]) -> Result<Self, Error> {
         let module_info = get_module_info(module_name)?;
+
         let start = module_info.lpBaseOfDll as usize;
+        
         let size = try_int_cast!(module_info.SizeOfImage, usize,
             "size of module")?;
+        
         let end = start + size;
+        
         info!("[{:#x}, {:#x}) is {:#x} bytes.", start, end, size);
+        
         Ok(Self {
             start,
             end,
