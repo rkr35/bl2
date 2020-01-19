@@ -89,7 +89,7 @@ pub fn main(input: OldTokenStream) -> OldTokenStream {
                 let hwnd = null_mut();
                 
                 let text = wide_format!("DisableThreadLibraryCalls() failed. \
-                    GetLastError = {}", error_code);
+                    GetLastError = {:#x}", error_code);
                     
                 let caption = w!("Error");
 

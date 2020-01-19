@@ -1,4 +1,4 @@
-use core::fmt::{self, Display};
+use core::fmt::{self, Display, LowerHex};
 
 #[derive(Debug)]
 pub struct WinApiErrorCode {
@@ -13,7 +13,13 @@ impl From<u32> for WinApiErrorCode {
 
 impl Display for WinApiErrorCode {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        self.error.fmt(f)
+        Display::fmt(&self.error, f)
+    }
+}
+
+impl LowerHex for WinApiErrorCode {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        LowerHex::fmt(&self.error, f)
     }
 }
 
