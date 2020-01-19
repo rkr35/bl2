@@ -5,8 +5,7 @@ use log::info;
 
 pub mod winapi_helpers;
 
-mod pattern;
-pub use pattern::{Byte, PatternFinder};
+pub mod pattern;
 
 pub fn idle() {
     use std::io::{self, Read};
