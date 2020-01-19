@@ -65,6 +65,8 @@ pub fn main(input: OldTokenStream) -> OldTokenStream {
         #[allow(non_snake_case)]
         extern "system" fn DllMain(dll: HINSTANCE, reason: DWORD, _: LPVOID)
             -> BOOL {
+            use bl2_core::{wide_format, winapi};
+            use bl2_core::winapi_helpers::WinApiErrorCode;
             use core::ptr::null_mut;
             use winapi::{
                 um::{
@@ -75,25 +77,32 @@ pub fn main(input: OldTokenStream) -> OldTokenStream {
                 },
             };
 
-            if reason == DLL_PROCESS_ATTACH {
-                unsafe {
-                    if DisableThreadLibraryCalls(dll) == 0 {
-                        use wchar::wch_c as w;
-                        let hwnd = null_mut();
-                        let text = w!("DisableThreadLibraryCalls failed.");
-                        let caption = w!("Error");
-                        let mb_type = MB_OK;
-                        MessageBoxW(hwnd, text.as_ptr(), caption.as_ptr(),
-                            mb_type);
-                        return FALSE;
-                    } else {
-                        CreateThread(null_mut(), 0, Some(on_attach), dll.cast(),
-                            0, null_mut());
-                    }
-                }
+            if reason != DLL_PROCESS_ATTACH {
+                return TRUE;
             }
 
-            TRUE
+            let api_result = unsafe { winapi!(DisableThreadLibraryCalls, dll) };
+
+            if let Err(error_code) = api_result {
+                use wchar::wch_c as w;
+                
+                let hwnd = null_mut();
+                
+                let text = wide_format!("DisableThreadLibraryCalls() failed. \
+                    GetLastError = {}", error_code);
+                    
+                let caption = w!("Error");
+
+                unsafe { MessageBoxW(hwnd, text.as_ptr(), caption.as_ptr(),
+                    MB_OK) };
+
+                FALSE
+            } else {
+                unsafe { CreateThread(null_mut(), 0, Some(on_attach),
+                    dll.cast(), 0, null_mut()) };
+                    
+                TRUE
+            }
         }
     };
 
