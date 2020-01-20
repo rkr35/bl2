@@ -10,6 +10,9 @@ use syn::parse_macro_input;
 
 #[proc_macro]
 pub fn main(input: OldTokenStream) -> OldTokenStream {
+    #[cfg(not(windows))]
+    compile_error!("This hook only works with Windows.");
+
     let input = parse_macro_input!(input as TokenStream);
 
     let generated = quote! {
