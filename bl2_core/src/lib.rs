@@ -3,8 +3,8 @@
 
 use log::info;
 
+pub mod array;
 pub mod pattern;
-pub mod tarray;
 pub mod winapi_helpers;
 
 pub fn idle() {
