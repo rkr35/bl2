@@ -2,6 +2,7 @@ use core::convert::TryFrom;
 use core::mem::{MaybeUninit, size_of};
 use crate::{winapi, winapi_helpers::{WinApiErrorCode}};
 use log::info;
+use std::path::Path;
 use thiserror::Error;
 use wchar::wch_c as w;
 use ::winapi::{
@@ -185,5 +186,9 @@ impl GlobalNamesAndObjects {
         let names = finder.find_names()?.ok_or(Error::NamesNotFound)?;
         let objects = finder.find_objects()?.ok_or(Error::ObjectsNotFound)?;
         Ok(Self { names, objects })
+    }
+
+    pub fn dump(&self, output_directory: &Path) -> Result<(), Error> {
+        todo!();
     }
 }
