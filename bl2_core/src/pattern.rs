@@ -35,14 +35,14 @@ pub enum Error {
         max: String,
     },
 
-    #[error("Overflow on addition when calculating end of module address.\
+    #[error("Overflow on addition when calculating end of module address. \
         start = {start}, size = {size}")]
     OverflowEndOfModule {
         start: usize,
         size: usize,
     },
 
-    #[error("Overflow on subtraction when calculating end of search space.\
+    #[error("Overflow on subtraction when calculating end of search space. \
         module end = {end}, pattern length = {pattern_length}")]
     OverflowSearchSpaceEnd {
         end: usize,
