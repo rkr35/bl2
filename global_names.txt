@@ -1,2 +1,4 @@
 I = Find(8B 0D ? ? ? ? 83 3C 81)
 Global_Names = *(u32*)(I + 2)
+
+00E8BD1C - 8B 0D 04022502        - mov ecx,[02250204]

@@ -74,6 +74,13 @@ pub const NAMES_PATTERN: &[Byte] = &[
     Byte::Literal(0x83), Byte::Literal(0x3C), Byte::Literal(0x81),
 ];
 
+pub const OBJECTS_PATTERN: &[Byte] = &[
+    Byte::Literal(0x8B), Byte::Literal(0x0D),
+    Byte::Wildcard, Byte::Wildcard, Byte::Wildcard, Byte::Wildcard,
+    Byte::Literal(0x8B), Byte::Literal(0x3C), Byte::Literal(0x81),
+    Byte::Literal(0x8B), Byte::Literal(0xB5),
+];
+
 pub struct Finder {
     start: usize,
     end: usize,
@@ -145,6 +152,14 @@ impl Finder {
     pub fn find_names(&self) -> Result<Option<usize>, Error> {
         // 00E8BD1C - 8B 0D 04022502        - mov ecx,[02250204]
         Ok(self.find(NAMES_PATTERN)?.map(|address| {
+            let address = (address + 2) as *const usize;
+            unsafe { *address }
+        }))
+    }
+
+    pub fn find_objects(&self) -> Result<Option<usize>, Error> {
+        // 00D3524A - 8B 0D E0252902        - mov ecx,[022925E0]
+        Ok(self.find(OBJECTS_PATTERN)?.map(|address| {
             let address = (address + 2) as *const usize;
             unsafe { *address }
         }))

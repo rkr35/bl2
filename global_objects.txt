@@ -1,2 +1,4 @@
 I = Find(8B 0D ? ? ? ? 8B 3C 81 8B B5)
 Global_Objects = *(u32*)(I + 2)
+
+00D3524A - 8B 0D E0252902        - mov ecx,[022925E0]
