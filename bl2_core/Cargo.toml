@@ -9,6 +9,7 @@ edition = "2018"
 [dependencies]
 log = "0.4"
 thiserror = "1.0"
+wchar = "0.6"
 winapi = { version = "0.3", features = [
     "errhandlingapi",
     "libloaderapi",

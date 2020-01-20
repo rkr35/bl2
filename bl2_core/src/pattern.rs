@@ -3,6 +3,7 @@ use core::mem::{MaybeUninit, size_of};
 use crate::{winapi, winapi_helpers::{WinApiErrorCode}};
 use log::info;
 use thiserror::Error;
+use wchar::wch_c as w;
 use ::winapi::{
     shared::minwindef::HMODULE as Module,
     um::{
@@ -47,7 +48,13 @@ pub enum Error {
     OverflowSearchSpaceEnd {
         end: usize,
         pattern_length: usize,
-    }
+    },
+
+    #[error("Unable to find address of global names.")]
+    NamesNotFound,
+
+    #[error("Unable to find address of global objects.")]
+    ObjectsNotFound,
 }
 
 macro_rules! try_int_cast {
@@ -163,5 +170,20 @@ impl Finder {
             let address = (address + 2) as *const usize;
             unsafe { *address }
         }))
+    }
+}
+
+#[derive(Debug)]
+pub struct GlobalNamesAndObjects {
+    names: usize,
+    objects: usize,
+}
+
+impl GlobalNamesAndObjects {
+    pub fn new() -> Result<Self, Error> {
+        let finder = Finder::new(w!("Borderlands2.exe"))?;
+        let names = finder.find_names()?.ok_or(Error::NamesNotFound)?;
+        let objects = finder.find_objects()?.ok_or(Error::ObjectsNotFound)?;
+        Ok(Self { names, objects })
     }
 }
