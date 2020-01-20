@@ -3,9 +3,9 @@
 
 use log::info;
 
-pub mod winapi_helpers;
-
 pub mod pattern;
+pub mod tarray;
+pub mod winapi_helpers;
 
 pub fn idle() {
     use std::io::{self, Read};
