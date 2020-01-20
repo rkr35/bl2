@@ -1,7 +1,7 @@
 #![warn(clippy::pedantic)]
 #![allow(clippy::must_use_candidate)]
 
-use bl2_core::pattern::{self, GlobalNamesAndObjects};
+use bl2_core::globals::{self, GlobalNamesAndObjects};
 use bl2_macros::main;
 use log::{error, info};
 use std::path::Path;
@@ -25,10 +25,10 @@ impl<'a> Config<'a> {
 
 #[derive(Error, Debug)]
 enum Error {
-    #[error("Pattern finder error: {source}")]
-    Pattern {
+    #[error("Globals error: {source}")]
+    Globals {
         #[from]
-        source: pattern::Error,
+        source: globals::Error,
     }
 }
 
@@ -36,8 +36,7 @@ fn generate_sdk() -> Result<(), Error> {
     let config = Config::new();
     let globals = GlobalNamesAndObjects::new()?;
     globals.dump(config.output_directory)?;
-
-    todo!();
+    Ok(())
 }
 
 main! {

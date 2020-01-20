@@ -2,9 +2,7 @@ use core::convert::TryFrom;
 use core::mem::{MaybeUninit, size_of};
 use crate::{winapi, winapi_helpers::{WinApiErrorCode}};
 use log::info;
-use std::path::Path;
 use thiserror::Error;
-use wchar::wch_c as w;
 use ::winapi::{
     shared::minwindef::HMODULE as Module,
     um::{
@@ -50,12 +48,6 @@ pub enum Error {
         end: usize,
         pattern_length: usize,
     },
-
-    #[error("Unable to find address of global names.")]
-    NamesNotFound,
-
-    #[error("Unable to find address of global objects.")]
-    ObjectsNotFound,
 }
 
 macro_rules! try_int_cast {
@@ -75,19 +67,6 @@ pub enum Byte {
     Wildcard,
     Literal(u8),
 }
-
-pub const NAMES_PATTERN: &[Byte] = &[
-    Byte::Literal(0x8B), Byte::Literal(0x0D),
-    Byte::Wildcard, Byte::Wildcard, Byte::Wildcard, Byte::Wildcard,
-    Byte::Literal(0x83), Byte::Literal(0x3C), Byte::Literal(0x81),
-];
-
-pub const OBJECTS_PATTERN: &[Byte] = &[
-    Byte::Literal(0x8B), Byte::Literal(0x0D),
-    Byte::Wildcard, Byte::Wildcard, Byte::Wildcard, Byte::Wildcard,
-    Byte::Literal(0x8B), Byte::Literal(0x3C), Byte::Literal(0x81),
-    Byte::Literal(0x8B), Byte::Literal(0xB5),
-];
 
 pub struct Finder {
     start: usize,
@@ -155,40 +134,5 @@ impl Finder {
             })?;
         let mut search_space = self.start..end;
         Ok(search_space.find(|address| Self::is_match(*address, pattern)))
-    }
-
-    pub fn find_names(&self) -> Result<Option<usize>, Error> {
-        // 00E8BD1C - 8B 0D 04022502        - mov ecx,[02250204]
-        Ok(self.find(NAMES_PATTERN)?.map(|address| {
-            let address = (address + 2) as *const usize;
-            unsafe { *address }
-        }))
-    }
-
-    pub fn find_objects(&self) -> Result<Option<usize>, Error> {
-        // 00D3524A - 8B 0D E0252902        - mov ecx,[022925E0]
-        Ok(self.find(OBJECTS_PATTERN)?.map(|address| {
-            let address = (address + 2) as *const usize;
-            unsafe { *address }
-        }))
-    }
-}
-
-#[derive(Debug)]
-pub struct GlobalNamesAndObjects {
-    names: usize,
-    objects: usize,
-}
-
-impl GlobalNamesAndObjects {
-    pub fn new() -> Result<Self, Error> {
-        let finder = Finder::new(w!("Borderlands2.exe"))?;
-        let names = finder.find_names()?.ok_or(Error::NamesNotFound)?;
-        let objects = finder.find_objects()?.ok_or(Error::ObjectsNotFound)?;
-        Ok(Self { names, objects })
-    }
-
-    pub fn dump(&self, output_directory: &Path) -> Result<(), Error> {
-        todo!();
     }
 }
