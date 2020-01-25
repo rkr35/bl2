@@ -47,13 +47,13 @@ pub struct GlobalNamesAndObjects {
 
 impl GlobalNamesAndObjects {
     pub fn new() -> Result<Self, Error> {
-        let finder = Finder::new(w!("Borderlands2.exe"))?;
-        
         fn get_mov_src_operand(mov_instruction_address: usize) -> usize {
             let src_operand_address = (mov_instruction_address + 2)
                 as *const usize;
             unsafe { *src_operand_address }
         }
+
+        let finder = Finder::new(w!("Borderlands2.exe"))?;
 
         let names = finder
             .find(NAMES_PATTERN)?
