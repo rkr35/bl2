@@ -5,6 +5,9 @@ use crate::{
     pattern::{self, Byte, Finder},
 };
 use log::info;
+use std::ffi::OsStr;
+use std::fs::{self, File};
+use std::io::{self, BufWriter, Write};
 use std::path::Path;
 use thiserror::Error;
 use wchar::wch_c as w;
@@ -21,6 +24,12 @@ pub enum Error {
     Pattern {
         #[from]
         source: pattern::Error,
+    },
+    
+    #[error("Io error: {source}")]
+    Io {
+        #[from]
+        source: io::Error,
     }
 }
 
@@ -70,9 +79,40 @@ impl GlobalNamesAndObjects {
         Ok(Self { names, objects })
     }
 
+    fn dump_names(&self, output: &Path) -> Result<(), Error> {
+        info!("Creating file {}", 
+            output.file_name()
+            .and_then(OsStr::to_str)
+            .unwrap_or("BAD FILE NAME"));
+        
+        let mut file = File::create(output).map(BufWriter::new)?;
+        
+        writeln!(&mut file, "Global names address: {:#x}",
+            self.names as *const _ as usize)?;
+        
+        info!("Dumping names.");
+        for (i, name) in self.names.iter().enumerate() {
+            if let Some(name) = name {
+                writeln!(&mut file, "[{}] {}", i, name)?;
+            } else {
+                writeln!(&mut file, "[{}] !null!", i)?;
+            }
+        }
+        info!("Done dumping names.");
+
+        Ok(())
+    }
+
     pub fn dump(&self, output_directory: &Path) -> Result<(), Error> {
-        info!("n {:#x}", self.names as *const _ as usize);
+        create_directory(output_directory)?;
+        self.dump_names(&output_directory.join("names_dump.txt"))?;
         info!("o {:#x}", self.objects as *const _ as usize);
         Ok(())
     }
+}
+
+fn create_directory(directory: &Path) -> Result<(), Error> {
+    info!("Creating directory {}", directory.to_string_lossy());
+    fs::create_dir_all(directory)?;
+    Ok(())
 }
