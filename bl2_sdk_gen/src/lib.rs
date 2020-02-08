@@ -1,7 +1,7 @@
 #![warn(clippy::pedantic)]
 #![allow(clippy::must_use_candidate)]
 
-use bl2_core::globals::{self, GlobalNamesAndObjects};
+use bl2_core::globals::{self, Globals};
 use bl2_macros::main;
 use log::{error, info};
 use std::path::Path;
@@ -34,7 +34,7 @@ enum Error {
 
 fn generate_sdk() -> Result<(), Error> {
     let config = Config::new();
-    let globals = GlobalNamesAndObjects::new()?;
+    let globals = Globals::new()?;
     globals.dump(config.output_directory)?;
     Ok(())
 }
