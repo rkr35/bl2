@@ -1,7 +1,7 @@
 use crate::{
     array::Array,
     object::Object,
-    name::entry::Entry,
+    name::Entry,
     pattern::{self, Byte, Finder},
 };
 use log::info;

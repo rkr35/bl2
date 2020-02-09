@@ -1,8 +1,5 @@
 use crate::{
-    name::{
-        entry::Entry,
-        name::Name,
-    },
+    name::{Entry, Name},
     globals::Names,
 };
 
