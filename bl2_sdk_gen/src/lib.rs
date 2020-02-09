@@ -1,6 +1,3 @@
-#![warn(clippy::pedantic)]
-#![allow(clippy::must_use_candidate)]
-
 use bl2_core::globals::{self, Globals};
 use bl2_macros::main;
 use log::{error, info};
