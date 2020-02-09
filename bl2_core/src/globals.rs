@@ -93,6 +93,9 @@ impl Globals {
         info!("Dumping names.");
         for (i, name) in self.names.iter().enumerate() {
             if let Some(name) = name {
+                let name = name
+                    .to_str()
+                    .unwrap_or("not a valid utf-8 string");
                 writeln!(&mut file, "[{}] {}", i, name)?;
             } else {
                 writeln!(&mut file, "[{}] !null!", i)?;
@@ -119,6 +122,9 @@ impl Globals {
             if let Some(object) = object {
                 let address = object as *const _ as usize;
                 if let Some(name) = object.name(self.names) {
+                    let name = name
+                        .to_str()
+                        .unwrap_or("not a valid utf-8 string");
                     writeln!(&mut file, "[{}] {} {:#x}", i, name, address)?;
                 } else {
                     writeln!(&mut file, "[{}] name not found for object at \

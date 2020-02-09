@@ -1,4 +1,3 @@
-use core::fmt::{self, Display, Formatter};
 use core::str::Utf8Error;
 use std::ffi::CStr;
 use std::os::raw::c_char;
@@ -25,14 +24,5 @@ impl Entry {
         let c_str = unsafe { CStr::from_ptr(ptr) };
 
         c_str.to_str()
-    }
-}
-
-impl Display for Entry {
-    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        match self.to_str() {
-            Ok(s) => s.fmt(f),
-            Err(e) => e.fmt(f),
-        }
     }
 }
