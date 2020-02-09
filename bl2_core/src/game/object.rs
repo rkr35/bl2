@@ -1,7 +1,5 @@
-use crate::{
-    name::{Entry, Name},
-    globals::Names,
-};
+use crate::game::{Entry, Name};
+use crate::globals::Names;
 
 /*
 class UObject
@@ -34,5 +32,28 @@ pub struct Object<'a> {
 impl<'a> Object<'a> {
     pub fn name<'n>(&self, global_names: &'n Names<'n>) -> Option<&'n Entry> {
         self.name.entry(global_names)
+    }
+
+    pub fn full_name(&self, global_names: &Names) -> String {
+		todo!();
+        /*
+        	if (GetClass().IsValid())
+	{
+		std::string temp;
+
+		for (auto outer = GetOuter(); outer.IsValid(); outer = outer.GetOuter())
+		{
+			temp = outer.GetName() + "." + temp;
+		}
+
+		std::string name = GetClass().GetName();
+		name += " ";
+		name += temp;
+		name += GetName();
+
+		return name;
+	}
+
+        */
     }
 }

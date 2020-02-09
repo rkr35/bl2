@@ -1,9 +1,5 @@
-use crate::{
-    array::Array,
-    object::Object,
-    name::Entry,
-    pattern::{self, Byte, Finder},
-};
+use crate::game::{Array, Entry, Object};
+use crate::pattern::{self, Byte, Finder};
 use log::info;
 use std::ffi::OsStr;
 use std::fs::{self, File};

@@ -1,9 +1,7 @@
 use log::info;
 
-pub mod array;
+pub mod game;
 pub mod globals;
-pub mod name;
-pub mod object;
 pub mod pattern;
 pub mod winapi_helpers;
 
