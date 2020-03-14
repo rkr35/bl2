@@ -40,7 +40,7 @@ impl<'a> Object<'a> {
         self.name.entry(global_names)
     }
 
-    pub fn full_name(&self, global_names: &Names) -> String {
+    pub fn full_name(&self, _global_names: &Names) -> String {
 		todo!();
         /*
         	if (GetClass().IsValid())

@@ -31,11 +31,11 @@ enum Error {
     }
 }
 
-struct Package {
+struct _Package {
 
 }
 
-fn process_packages(config: &Config, globals: &Globals) -> Result<(), Error> {
+fn process_packages(_config: &Config, globals: &Globals) -> Result<(), Error> {
     // let mut packages = vec![false, true];
     // let mut processed_objects = HashMap::<usize, bool>::new();
     let mut package_objects: HashSet<_> = globals
