@@ -1,4 +1,5 @@
 use core::hash::{Hash, Hasher};
+use core::iter;
 use core::ptr;
 use crate::game::{Entry, Name};
 use crate::globals::Names;
@@ -63,8 +64,20 @@ impl<'a> Object<'a> {
         */
 	}
 	
-	pub fn get_package(&self) -> &Object {
-		todo!("get_package()");
+	pub fn get_package(&self) -> Option<&Object> {
+		self.outer_iter().last()
+	}
+
+	fn outer_iter(&self) -> impl Iterator<Item = &Object> {
+		let mut current = self; // &Object
+		iter::from_fn(move || {
+			if let Some(o) = current.outer {
+				current = o;
+				Some(o)
+			} else {
+				None
+			}
+		})
 	}
 }
 
