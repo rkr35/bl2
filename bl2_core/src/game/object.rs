@@ -57,7 +57,13 @@ impl<'a> Object<'a> {
 	}
 
         */
-    }
+	}
+	
+	pub fn get_package(&self) -> &Object {
+		todo!("get_package()");
+	}
+}
+
 impl<'a> PartialEq for Object<'a> {
 	fn eq(&self, other: &Self) -> bool {
 		ptr::eq(self, other)
