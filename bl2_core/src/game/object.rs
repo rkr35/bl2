@@ -32,7 +32,11 @@ pub struct Object<'a> {
 }
 
 impl<'a> Object<'a> {
-    pub fn name<'n>(&self, global_names: &'n Names<'n>) -> Option<&'n Entry> {
+    pub fn name<'n>(&self, global_names: &'n Names<'n>) -> Option<&'n str> {
+		self.entry(global_names)?.to_str().ok()
+	}
+
+    pub fn entry<'n>(&self, global_names: &'n Names<'n>) -> Option<&'n Entry> {
         self.name.entry(global_names)
     }
 

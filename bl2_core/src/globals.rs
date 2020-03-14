@@ -117,7 +117,7 @@ impl Globals {
         for (i, object) in self.objects.iter().enumerate() {
             if let Some(object) = object {
                 let address = object as *const _ as usize;
-                if let Some(name) = object.name(self.names) {
+                if let Some(name) = object.entry(self.names) {
                     let name = name
                         .to_str()
                         .unwrap_or("not a valid utf-8 string");
