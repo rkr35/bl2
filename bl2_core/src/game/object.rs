@@ -76,7 +76,16 @@ impl<'a> Object<'a> {
 		}))
 	}
 
-		})
+	pub fn super_iter(&self) -> impl Iterator<Item = &Object> {
+		let mut current = self;
+		iter::from_fn(move || Some({
+			current = current.class?;
+			current
+		}))
+	}
+
+	pub fn is(&self, class: &Object) -> bool {
+		self.super_iter().any(|c| ptr::eq(c, class))
 	}
 }
 
