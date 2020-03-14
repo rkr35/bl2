@@ -1,5 +1,7 @@
 use bl2_core::globals::{self, Globals};
+use bl2_core::game::{Object};
 use bl2_macros::main;
+use std::collections::{HashMap, HashSet};
 use log::{error, info};
 use std::path::Path;
 use thiserror::Error;
@@ -29,10 +31,27 @@ enum Error {
     }
 }
 
+struct Package {
+
+}
+
+fn process_packages(config: &Config, globals: &Globals) -> Result<(), Error> {
+    // let mut packages = vec![false, true];
+    // let mut processed_objects = HashMap::<usize, bool>::new();
+    let mut package_objects: HashSet<_> = globals
+        .objects
+        .iter()
+        .filter_map(|o| o.as_ref())
+        .map(|o| o.get_package())
+        .collect();
+    Ok(())
+}
+
 fn generate_sdk() -> Result<(), Error> {
     let config = Config::new();
     let globals = Globals::new()?;
     globals.dump(config.output_directory)?;
+    process_packages(&config, &globals)?;
     Ok(())
 }
 
