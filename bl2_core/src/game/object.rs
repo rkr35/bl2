@@ -1,3 +1,4 @@
+use core::hash::{Hash, Hasher};
 use core::ptr;
 use crate::game::{Entry, Name};
 use crate::globals::Names;
@@ -64,4 +65,10 @@ impl<'a> PartialEq for Object<'a> {
 }
 
 impl<'a> Eq for Object<'a> {}
+
+impl<'a> Hash for Object<'a> {
+	fn hash<H: Hasher>(&self, state: &mut H) {
+		let pointer = self as *const _ as usize;
+		pointer.hash(state);
+	}
 }
