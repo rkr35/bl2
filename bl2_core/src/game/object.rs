@@ -1,3 +1,4 @@
+use core::ptr;
 use crate::game::{Entry, Name};
 use crate::globals::Names;
 
@@ -56,4 +57,11 @@ impl<'a> Object<'a> {
 
         */
     }
+impl<'a> PartialEq for Object<'a> {
+	fn eq(&self, other: &Self) -> bool {
+		ptr::eq(self, other)
+	}
+}
+
+impl<'a> Eq for Object<'a> {}
 }
