@@ -69,14 +69,13 @@ impl<'a> Object<'a> {
 	}
 
 	fn outer_iter(&self) -> impl Iterator<Item = &Object> {
-		let mut current = self; // &Object
-		iter::from_fn(move || {
-			if let Some(o) = current.outer {
-				current = o;
-				Some(o)
-			} else {
-				None
-			}
+		let mut current = self;
+		iter::from_fn(move || Some({
+			current = current.outer?;
+			current
+		}))
+	}
+
 		})
 	}
 }
