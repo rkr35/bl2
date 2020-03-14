@@ -38,12 +38,20 @@ struct _Package {
 fn process_packages(_config: &Config, globals: &Globals) -> Result<(), Error> {
     // let mut packages = vec![false, true];
     // let mut processed_objects = HashMap::<usize, bool>::new();
-    let mut package_objects: HashSet<_> = globals
+    let package_objects: HashSet<_> = globals
         .objects
         .iter()
-        .filter_map(|o| o.as_ref())
-        .map(|o| o.get_package())
+        .filter_map(|o| o.as_ref().and_then(|o| o.get_package()))
         .collect();
+
+    for o in package_objects {
+        if let Some(name) = o.name(globals.names) {
+            info!("{}", name);
+        } else {
+            let address = o as *const _ as usize;
+            error!("null package name for object {:#x}", address);
+        }
+    }
     Ok(())
 }
 
