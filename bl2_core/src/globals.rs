@@ -46,8 +46,8 @@ const OBJECTS_PATTERN: &[Byte] = &[
 ];
 
 pub struct Globals {
-    names: &'static Names<'static>,
-    objects: &'static mut Objects<'static>,
+    pub names: &'static Names<'static>,
+    pub objects: &'static mut Objects<'static>,
 }
 
 impl Globals {
