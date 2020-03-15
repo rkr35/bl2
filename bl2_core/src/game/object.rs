@@ -67,7 +67,7 @@ impl<'a> Object<'a> {
 		}
 	}
 	
-	pub fn get_package(&self) -> Option<&Object> {
+	pub fn package(&self) -> Option<&Object> {
 		self.outer_iter().last()
 	}
 
