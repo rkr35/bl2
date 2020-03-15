@@ -16,7 +16,6 @@ panic = 'unwind'
 panic = 'unwind'
 lto = 'fat'
 codegen-units = 1
-incremental = true
 debug = 0
 
 [workspace]
