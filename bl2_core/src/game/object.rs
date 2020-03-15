@@ -41,8 +41,27 @@ impl<'a> Object<'a> {
         self.name.entry(global_names)
     }
 
-    pub fn full_name(&self, _global_names: &Names) -> String {
-		todo!();
+    pub fn full_name<'n>(&self, global_names: &'n Names<'n>) -> String {
+		let outers = {
+			let mut v: Vec<_> = self
+				.outer_iter()
+				.map(|o| o.name(global_names).unwrap_or("!OUTER_UNKNOWN!"))
+				.collect();
+			v.reverse();
+			v
+		};
+
+		let class = self
+			.class
+			.and_then(|c| c.name(global_names))
+			.unwrap_or("!CLASS_UNKNOWN!");
+			
+		let self_name = self
+			.name(global_names)
+			.unwrap_or("!SELF_UNKNOWN!");
+
+		format!("{} {}.{}", class, outers.join("."), self_name)
+
         /*
         	if (GetClass().IsValid())
 	{
