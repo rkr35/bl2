@@ -5,6 +5,7 @@ use std::ffi::OsStr;
 use std::fs::{self, File};
 use std::io::{self, BufWriter, Write};
 use std::path::Path;
+use std::time::Instant;
 use thiserror::Error;
 use wchar::wch_c as w;
 
@@ -131,7 +132,14 @@ impl Globals {
     pub fn dump(&self, output_directory: &Path) -> Result<(), Error> {
         create_directory(output_directory)?;
         self.dump_names(&output_directory.join("names_dump.txt"))?;
+
+        let now = Instant::now();
         self.dump_objects(&output_directory.join("objects_dump.txt"))?;
+        let elapsed = now.elapsed();
+
+        info!("It took {} seconds to dump global objects.",
+            elapsed.as_secs_f64());
+            
         Ok(())
     }
 }
