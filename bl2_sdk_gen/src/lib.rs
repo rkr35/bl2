@@ -28,22 +28,37 @@ enum Error {
     Globals {
         #[from]
         source: globals::Error,
+    },
+
+    #[error("Unable to find static class \"{missing_class}\".")]
+    UnableToFindStaticClasses {
+        missing_class: String,
     }
 }
 
-struct _Package {
+struct StaticClasses<'a> {
+    pub enumeration: &'a Object<'a>,
+}
 
+impl<'a> StaticClasses<'a> {
+    pub fn new(globals: &Globals) -> Result<StaticClasses, Error> {
+        let find = |class: &str| globals
+            .non_null_objects_iter()
+            .find(|o| o.full_name(globals.names) == class)
+            .ok_or_else(|| Error::UnableToFindStaticClasses {
+                missing_class: class.to_string(),
+            });
+
+        Ok(StaticClasses {
+            enumeration: find("Class Core.Enum")?,
+        })
+    }
 }
 
 fn process_packages(_config: &Config, globals: &Globals) -> Result<(), Error> {
-    // let mut packages = vec![false, true];
-    // let mut processed_objects = HashMap::<usize, bool>::new();
-    let package_objects: HashSet<_> = globals
-        .objects
-        .iter()
-        .filter_map(|o| o.as_ref().and_then(|o| o.get_package()))
-        .collect();
-
+    info!("Looking for static_classes.");
+    let static_classes = StaticClasses::new(globals)?;
+    info!("Found static_classes.");
     for o in package_objects {
         if let Some(name) = o.name(globals.names) {
             info!("{}", name);
