@@ -142,6 +142,16 @@ impl Globals {
             
         Ok(())
     }
+
+    pub fn non_null_objects_iter(&self) -> impl Iterator<Item = &Object> {
+        self
+            .objects
+            .iter()
+            .filter_map(|o| o.as_ref())
+            // Reinterpret &&mut T as &T. Sits better with borrowck if we don't
+            // need mutability of T.
+            .map(|o| &**o)
+    }
 }
 
 fn create_directory(directory: &Path) -> Result<(), Error> {
