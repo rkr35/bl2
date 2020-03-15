@@ -69,23 +69,15 @@ impl<'a> Object<'a> {
 	}
 
 	fn outer_iter(&self) -> impl Iterator<Item = &Object> {
-		let mut current = self;
-		iter::from_fn(move || Some({
-			current = current.outer?;
-			current
-		}))
+		iter::successors(self.outer, |o| o.outer)
 	}
 
-	pub fn super_iter(&self) -> impl Iterator<Item = &Object> {
-		let mut current = self;
-		iter::from_fn(move || Some({
-			current = current.class?;
-			current
-		}))
+	pub fn class_iter(&self) -> impl Iterator<Item = &Object> {
+		iter::successors(self.class, |o| o.class)
 	}
 
 	pub fn is(&self, class: &Object) -> bool {
-		self.super_iter().any(|c| ptr::eq(c, class))
+		self.class_iter().any(|c| ptr::eq(c, class))
 	}
 }
 
