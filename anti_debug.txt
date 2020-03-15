@@ -21,41 +21,36 @@ Patch to always take the null branch.
 01721F0E | 8D55 E0                  | lea edx,dword ptr ss:[ebp-20]                                            |
 01721F11 | 52                       | push edx                                                                 |
 
-C6 45 FC 08 FF 15 84 92 
-E0 01
-68 54 D0 FB 01 68 40 D0 FB 01 89 45 F0 FF 15 BC 92 E0 01 50 FF 15 B8 92 E0 01 3B C3 
-74 0A 8B 4D F0 53 53 6A 11 51 FF D0 53 8D 55 E0 52 
-
 Minimal unique search:
 74 0A 8B 4D F0 53
+^^
+EB
 
-019A362A | 8BF0                     | mov esi,eax                                                              |
-019A362C | 85F6                     | test esi,esi                                                             |
-019A362E | 74 2A                    | je borderlands2.19A365A                                                  |
-019A3630 | 6A 00                    | push 0                                                                   |
-019A3632 | 6A 04                    | push 4                                                                   |
-019A3634 | 8D4D 08                  | lea ecx,dword ptr ss:[ebp+8]                                             |
-019A3637 | 51                       | push ecx                                                                 |
-019A3638 | 6A 1E                    | push 1E                                                                  |
-019A363A | C745 08 00000000         | mov dword ptr ss:[ebp+8],0                                               |
-019A3641 | FF15 3C920802            | call dword ptr ds:[<&GetCurrentProcess>]                                 |
-019A3647 | 50                       | push eax                                                                 |
-019A3648 | FFD6                     | call esi                                                                 |
-019A364A | 85C0                     | test eax,eax                                                             |
-019A364C | 75 0C                    | jne borderlands2.19A365A                                                 |
-019A364E | 3945 08                  | cmp dword ptr ss:[ebp+8],eax                                             |
-019A3651 | 74 07                    | je borderlands2.19A365A                                                  |
-019A3653 | 50                       | push eax                                                                 |
-019A3654 | FF15 24940802            | call dword ptr ds:[<&exit>]                                              |
-019A365A | A1 C48E5202              | mov eax,dword ptr ds:[2528EC4]                                           |
-019A365F | 33F6                     | xor esi,esi                                                              |
-019A3661 | 85C0                     | test eax,eax                                                             |
+00C26429 | F3:0F110424              | movss dword ptr ss:[esp],xmm0           |
+00C2642E | E8 1D76FFFF              | call borderlands2.C1DA50                |
+00C26433 | 68 5CE94C01              | push borderlands2.14CE95C               | 14CE95C:"NtQueryInformationProcess"
+00C26438 | 68 30E94C01              | push borderlands2.14CE930               | 14CE930:L"ntdll.dll"
+00C2643D | FF15 54413101            | call dword ptr ds:[<&GetModuleHandleW>] |
+00C26443 | 50                       | push eax                                |
+00C26444 | FF15 50413101            | call dword ptr ds:[<&GetProcAddress>]   |
+00C2644A | 8BF0                     | mov esi,eax                             |
+00C2644C | 85F6                     | test esi,esi                            |
+00C2644E | 74 2A                    | je borderlands2.C2647A                  |
+00C26450 | 6A 00                    | push 0                                  |
+00C26452 | 6A 04                    | push 4                                  |
+00C26454 | 8D4D 08                  | lea ecx,dword ptr ss:[ebp+8]            |
+00C26457 | 51                       | push ecx                                |
+00C26458 | 6A 1E                    | push 1E                                 |
+00C2645A | C745 08 00000000         | mov dword ptr ss:[ebp+8],0              |
+00C26461 | FF15 EC403101            | call dword ptr ds:[<&GetCurrentProcess> |
+00C26467 | 50                       | push eax                                |
+00C26468 | FFD6                     | call esi                                |
+00C2646A | 85C0                     | test eax,eax                            |
+00C2646C | 75 0C                    | jne borderlands2.C2647A                 |
+00C2646E | 3945 08                  | cmp dword ptr ss:[ebp+8],eax            |                                                         |
+
 
 Minimial unique search:
-74 07 50 FF 15 24
-
-8B F0 85 F6 74 2A 6A 00 6A 04 8D 4D 08 51 6A 1E C7 45 08 00 00 00 00 FF 15 3C 92
-    08 02 
-50 FF D6 85 C0 75 0C 39 45 08 74 07 50 FF 15 24 94
-                              ^^
-                              EB
+74 2a 6a 00 6a 04
+^^
+EB
