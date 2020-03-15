@@ -3,6 +3,7 @@ use core::iter;
 use core::ptr;
 use crate::game::{Entry, Name};
 use crate::globals::Names;
+use super::Struct;
 
 /*
 class UObject
@@ -28,7 +29,7 @@ pub struct Object<'a> {
     pad1: [u8; 0x4],
     outer: Option<&'a Object<'a>>,
     name: Name,
-    class: Option<&'a Object<'a>>,
+    class: Option<&'a Struct<'a>>,
     pad2: [u8; 0x4],
 }
 
@@ -75,12 +76,12 @@ impl<'a> Object<'a> {
 		iter::successors(self.outer, |o| o.outer)
 	}
 
-	pub fn class_iter(&self) -> impl Iterator<Item = &Object> {
-		iter::successors(self.class, |o| o.class)
+	pub fn class_iter(&self) -> impl Iterator<Item = &Struct> {
+		iter::successors(self.class, |o| o.super_field)
 	}
 
 	pub fn is(&self, class: &Object) -> bool {
-		self.class_iter().any(|c| c == class)
+		self.class_iter().any(|c| c.eq(class))
 	}
 }
 
