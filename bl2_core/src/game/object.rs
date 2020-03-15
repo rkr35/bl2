@@ -60,27 +60,11 @@ impl<'a> Object<'a> {
 			.name(global_names)
 			.unwrap_or("!SELF_UNKNOWN!");
 
-		format!("{} {}.{}", class, outers.join("."), self_name)
-
-        /*
-        	if (GetClass().IsValid())
-	{
-		std::string temp;
-
-		for (auto outer = GetOuter(); outer.IsValid(); outer = outer.GetOuter())
-		{
-			temp = outer.GetName() + "." + temp;
+		if outers.is_empty() {
+			format!("{} {}", class, self_name)
+		} else {
+			format!("{} {}.{}", class, outers, self_name)
 		}
-
-		std::string name = GetClass().GetName();
-		name += " ";
-		name += temp;
-		name += GetName();
-
-		return name;
-	}
-
-        */
 	}
 	
 	pub fn get_package(&self) -> Option<&Object> {
