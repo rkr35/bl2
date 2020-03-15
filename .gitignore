@@ -3,3 +3,4 @@
 Cargo.lock
 src/sdk/names_dump.txt
 src/sdk/objects_dump.txt
+.idea
