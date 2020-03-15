@@ -77,7 +77,7 @@ impl<'a> Object<'a> {
 	}
 
 	pub fn is(&self, class: &Object) -> bool {
-		self.class_iter().any(|c| ptr::eq(c, class))
+		self.class_iter().any(|c| c == class)
 	}
 }
 
