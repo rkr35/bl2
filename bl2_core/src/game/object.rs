@@ -34,15 +34,15 @@ pub struct Object<'a> {
 }
 
 impl<'a> Object<'a> {
-    pub fn name<'n>(&self, global_names: &'n Names<'n>) -> Option<&'n str> {
+    pub fn name<'n>(&self, global_names: &'n Names) -> Option<&'n str> {
 		self.entry(global_names)?.to_str().ok()
 	}
 
-    pub fn entry<'n>(&self, global_names: &'n Names<'n>) -> Option<&'n Entry> {
+    pub fn entry<'n>(&self, global_names: &'n Names) -> Option<&'n Entry> {
         self.name.entry(global_names)
     }
 
-    pub fn full_name<'n>(&self, global_names: &'n Names<'n>) -> String {
+    pub fn full_name<'n>(&self, global_names: &'n Names) -> String {
 		let outers = {
 			let mut v: Vec<_> = self
 				.outer_iter()

@@ -11,7 +11,7 @@ pub struct Name {
 }
 
 impl Name {
-    pub fn entry<'n>(self, global_names: &'n Names<'n>) -> Option<&'n Entry> {
+    pub fn entry<'n>(self, global_names: &'n Names) -> Option<&'n Entry> {
         global_names
             .get(self.index as usize)
             .copied()
