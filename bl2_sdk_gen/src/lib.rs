@@ -1,7 +1,7 @@
 use bl2_core::globals::{self, Globals};
-use bl2_core::game::{Object};
+use bl2_core::game::{Enum, Object};
 use bl2_macros::main;
-use std::collections::{HashMap, HashSet};
+use std::collections::{HashMap, hash_map::Entry, HashSet};
 use log::{error, info};
 use std::path::Path;
 use thiserror::Error;
@@ -61,18 +61,61 @@ impl<'a> StaticClasses<'a> {
     }
 }
 
+unsafe fn cast<'a, To>(object: &'a Object<'a>) -> &'a To {
+    &*(object as *const Object as *const To)
+}
+
+#[derive(Debug)]
+struct Enumeration<'a> {
+    name: &'a str,
+    full_name: String,
+    variants: Vec<&'a str>,
+}
+
+fn make_enum<'n>(enumeration: &Enum, globals: &'n Globals) -> Option<Enumeration<'n>> {
+    let name = enumeration
+        .name(globals.names)
+        .unwrap_or("BAD ENUM NAME");
+    
+    if name.contains("Default__") {
+        return None;
+    }
+
+    Some(Enumeration {
+        name,
+        full_name: enumeration.full_name(globals.names),
+        variants: enumeration.variants(globals.names),
+    })
+}
+
+#[derive(Default)]
+struct Package<'a> {
+    pub enumerations: Vec<Enumeration<'a>>,
+}
+
+impl<'a> Package<'a> {
+}
+
 fn process_packages(_config: &Config, globals: &Globals) -> Result<(), Error> {
     info!("Looking for static_classes.");
     let static_classes = StaticClasses::new(globals)?;
     info!("Found static_classes.");
-    for o in package_objects {
-        if let Some(name) = o.name(globals.names) {
-            info!("{}", name);
-        } else {
-            let address = o as *const _ as usize;
-            error!("null package name for object {:#x}", address);
+    let mut processed_objects = HashMap::<&Object, bool>::new();
+    let mut packages = HashMap::<&Object, Package>::new();
+
+    for object in globals.non_null_objects_iter() {
+        if let Some(package) = object.package() {
+            macro_rules! pkg { () => { packages.entry(package).or_default() } }
+
+            if object.is(static_classes.enumeration) {
+                let e = make_enum(unsafe { cast::<Enum>(object) }, globals);
+                if let Some(e) = e {
+                    pkg!().enumerations.push(e);
+                }
+            }
         }
     }
+
     Ok(())
 }
 
