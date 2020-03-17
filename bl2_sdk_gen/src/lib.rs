@@ -38,6 +38,9 @@ enum Error {
 
 struct StaticClasses<'a> {
     pub enumeration: &'a Object<'a>,
+    pub constant: &'a Object<'a>,
+    pub class: &'a Object<'a>,
+    pub script_struct: &'a Object<'a>,
 }
 
 impl<'a> StaticClasses<'a> {
@@ -51,6 +54,9 @@ impl<'a> StaticClasses<'a> {
 
         Ok(StaticClasses {
             enumeration: find("Class Core.Enum")?,
+            constant: find("Class Core.Const")?,
+            class: find("Class Core.Class")?,
+            script_struct: find("Class Core.ScriptStruct")?,
         })
     }
 }
