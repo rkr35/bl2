@@ -90,7 +90,7 @@ fn make_enum<'n>(enumeration: &Enum, globals: &'n Globals) -> Option<Enumeration
 
 #[derive(Default)]
 struct Package<'a> {
-    pub enumerations: Vec<Enumeration<'a>>,
+    pub enums: Vec<Enumeration<'a>>,
 }
 
 impl<'a> Package<'a> {
@@ -110,11 +110,12 @@ fn process_packages(_config: &Config, globals: &Globals) -> Result<(), Error> {
             if object.is(static_classes.enumeration) {
                 let e = make_enum(unsafe { cast::<Enum>(object) }, globals);
                 if let Some(e) = e {
-                    pkg!().enumerations.push(e);
+                    pkg!().enums.push(e);
                 }
             }
         }
     }
+
 
     Ok(())
 }
