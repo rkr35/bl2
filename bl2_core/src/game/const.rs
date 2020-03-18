@@ -1,8 +1,22 @@
-use super::Array;
-
-pub type UString<'a> = Array<'a, u16>; // &[u16] -> OsString -> Cow<str>
+use core::ops::{Deref, DerefMut};
+use super::{Array, Field, FString};
 
 #[repr(C)]
 pub struct Const<'a> {
-    value: UString<'a>,
+    pub field: Field<'a>,
+    pub value: FString<'a>,
+}
+
+impl<'a> Deref for Const<'a> {
+    type Target = Field<'a>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.field
+    }
+}
+
+impl<'a> DerefMut for Const<'a> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.field
+    }
 }
