@@ -4,6 +4,9 @@ pub use array::Array;
 mod field;
 pub use field::Field;
 
+mod fstring;
+pub use fstring::FString;
+
 mod name;
 pub use name::{Entry, Name};
 
