@@ -21,3 +21,7 @@ pub use r#enum::Enum;
 
 mod r#struct;
 pub use r#struct::Struct;
+
+pub unsafe fn cast<'a, To>(object: &'a Object<'a>) -> &'a To {
+    &*(object as *const Object as *const To)
+}

@@ -1,26 +1,22 @@
-use bl2_core::globals::{self, Globals};
-use bl2_core::game::{Enum, Object};
+use bl2_core::{
+    game::{cast, Const, Enum, Object},
+    globals::{self, Globals},
+};
 use bl2_macros::main;
-use std::collections::{HashMap, hash_map::Entry, HashSet};
 use log::{error, info};
+use std::collections::{HashMap, hash_map::Entry, HashSet};
+use std::ffi::OsString;
 use std::path::Path;
 use thiserror::Error;
 
-struct Config<'a> {
-    output_directory: &'a Path,
-}
+mod config;
+use config::Config;
 
-impl<'a> Config<'a> {
-    // todo: Read from file
-    // todo: Builder
-    fn new() -> Config<'static> {
-        const OUTPUT_DIR: &str = r"C:\Users\Royce\source\repos\bl2\src\sdk";
+mod static_classes;
+use static_classes::StaticClasses;
 
-        Config {
-            output_directory: Path::new(OUTPUT_DIR),
-        }
-    }
-}
+mod staging;
+use staging::{Constant, Enumeration, Package};
 
 #[derive(Error, Debug)]
 enum Error {
@@ -30,70 +26,11 @@ enum Error {
         source: globals::Error,
     },
 
-    #[error("Unable to find static class \"{missing_class}\".")]
+    #[error("Static classes error: {source}")]
     UnableToFindStaticClasses {
-        missing_class: String,
+        #[from]
+        source: static_classes::Error,
     }
-}
-
-struct StaticClasses<'a> {
-    pub enumeration: &'a Object<'a>,
-    pub constant: &'a Object<'a>,
-    pub class: &'a Object<'a>,
-    pub script_struct: &'a Object<'a>,
-}
-
-impl<'a> StaticClasses<'a> {
-    pub fn new(globals: &Globals) -> Result<StaticClasses, Error> {
-        let find = |class: &str| globals
-            .non_null_objects_iter()
-            .find(|o| o.full_name(globals.names) == class)
-            .ok_or_else(|| Error::UnableToFindStaticClasses {
-                missing_class: class.to_string(),
-            });
-
-        Ok(StaticClasses {
-            enumeration: find("Class Core.Enum")?,
-            constant: find("Class Core.Const")?,
-            class: find("Class Core.Class")?,
-            script_struct: find("Class Core.ScriptStruct")?,
-        })
-    }
-}
-
-unsafe fn cast<'a, To>(object: &'a Object<'a>) -> &'a To {
-    &*(object as *const Object as *const To)
-}
-
-#[derive(Debug)]
-struct Enumeration<'a> {
-    name: &'a str,
-    full_name: String,
-    variants: Vec<&'a str>,
-}
-
-fn make_enum<'n>(enumeration: &Enum, globals: &'n Globals) -> Option<Enumeration<'n>> {
-    let name = enumeration
-        .name(globals.names)
-        .unwrap_or("BAD ENUM NAME");
-    
-    if name.contains("Default__") {
-        return None;
-    }
-
-    Some(Enumeration {
-        name,
-        full_name: enumeration.full_name(globals.names),
-        variants: enumeration.variants(globals.names),
-    })
-}
-
-#[derive(Default)]
-struct Package<'a> {
-    pub enums: Vec<Enumeration<'a>>,
-}
-
-impl<'a> Package<'a> {
 }
 
 fn process_packages(_config: &Config, globals: &Globals) -> Result<(), Error> {
@@ -103,15 +40,24 @@ fn process_packages(_config: &Config, globals: &Globals) -> Result<(), Error> {
     let mut processed_objects = HashMap::<&Object, bool>::new();
     let mut packages = HashMap::<&Object, Package>::new();
 
+    // try_cast<Enum>(object, static_classes.enumeration)
     for object in globals.non_null_objects_iter() {
         if let Some(package) = object.package() {
             macro_rules! pkg { () => { packages.entry(package).or_default() } }
 
             if object.is(static_classes.enumeration) {
-                let e = make_enum(unsafe { cast::<Enum>(object) }, globals);
+                let e = Enumeration::from(unsafe { cast::<Enum>(object) }, globals);
                 if let Some(e) = e {
                     pkg!().enums.push(e);
                 }
+            } else if object.is(static_classes.constant) {
+                let c = Constant::from(unsafe { cast::<Const>(object) },
+                    globals);
+
+                if let Some(c) = c {
+                    pkg!().consts.push(c);
+                }
+            } else if object.is(static_classes.class) {
             }
         }
     }
