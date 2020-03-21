@@ -1,32 +1,33 @@
-use core::convert::TryFrom;
-use core::mem::{MaybeUninit, size_of};
-use crate::{winapi, winapi_helpers::{WinApiErrorCode}};
-use log::info;
-use thiserror::Error;
+use crate::{winapi, winapi_helpers::WinApiErrorCode};
 use ::winapi::{
     shared::minwindef::HMODULE as Module,
     um::{
         libloaderapi::GetModuleHandleW,
         processthreadsapi::GetCurrentProcess,
-        psapi::{
-            GetModuleInformation,
-            MODULEINFO as ModuleInfo,
-        },
+        psapi::{GetModuleInformation, MODULEINFO as ModuleInfo},
     },
 };
+use core::convert::TryFrom;
+use core::mem::{size_of, MaybeUninit};
+use log::info;
+use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum Error {
-    #[error("Failed to get module handle. Are you sure it's running and that \
-        the name is correctly spelled? GetLastError() == {0}")]
+    #[error(
+        "Failed to get module handle. Are you sure it's running and that \
+        the name is correctly spelled? GetLastError() == {0}"
+    )]
     GetModuleHandleFailed(WinApiErrorCode),
 
     #[error("Failed to get module information. GetLastError() == {0}")]
     GetModuleInformationFailed(WinApiErrorCode),
 
-    #[error("Attempted lossy integer cast when trying to convert {action} to \
+    #[error(
+        "Attempted lossy integer cast when trying to convert {action} to \
         {dest_type}. The source value is {source_value}, but the destination \
-        type \"{dest_type}\" only has a range of [{min}, {max}].")]
+        type \"{dest_type}\" only has a range of [{min}, {max}]."
+    )]
     LossyIntCast {
         action: &'static str,
         source_value: String,
@@ -35,32 +36,29 @@ pub enum Error {
         max: String,
     },
 
-    #[error("Overflow on addition when calculating end of module address. \
-        start = {start}, size = {size}")]
-    OverflowEndOfModule {
-        start: usize,
-        size: usize,
-    },
+    #[error(
+        "Overflow on addition when calculating end of module address. \
+        start = {start}, size = {size}"
+    )]
+    OverflowEndOfModule { start: usize, size: usize },
 
-    #[error("Overflow on subtraction when calculating end of search space. \
-        module end = {end}, pattern length = {pattern_length}")]
-    OverflowSearchSpaceEnd {
-        end: usize,
-        pattern_length: usize,
-    },
+    #[error(
+        "Overflow on subtraction when calculating end of search space. \
+        module end = {end}, pattern length = {pattern_length}"
+    )]
+    OverflowSearchSpaceEnd { end: usize, pattern_length: usize },
 }
 
 macro_rules! try_int_cast {
     ($from:expr, $to:ty, $action:literal) => {{
-        <$to>::try_from($from)
-            .map_err(|_| Error::LossyIntCast {
-                action: $action,
-                source_value: ($from).to_string(),
-                dest_type: stringify!($to),
-                min: <$to>::min_value().to_string(),
-                max: <$to>::max_value().to_string(),
-            })
-    }}
+        <$to>::try_from($from).map_err(|_| Error::LossyIntCast {
+            action: $action,
+            source_value: ($from).to_string(),
+            dest_type: stringify!($to),
+            min: <$to>::min_value().to_string(),
+            max: <$to>::max_value().to_string(),
+        })
+    }};
 }
 
 pub enum Byte {
@@ -81,15 +79,20 @@ fn get_module(name: &[u16]) -> Result<Module, Error> {
 fn get_module_info(name: &[u16]) -> Result<ModuleInfo, Error> {
     let module = get_module(name)?;
     let process = unsafe { GetCurrentProcess() };
-    
+
     let mut module_info = MaybeUninit::<ModuleInfo>::uninit();
-    let module_info_size = try_int_cast!(size_of::<ModuleInfo>(), u32, 
-        "size of ModuleInfo")?;
+    let module_info_size = try_int_cast!(size_of::<ModuleInfo>(), u32, "size of ModuleInfo")?;
 
     unsafe {
         let module_info = module_info.as_mut_ptr();
-        winapi!(GetModuleInformation, process, module, module_info,
-            module_info_size).map_err(Error::GetModuleInformationFailed)?;
+        winapi!(
+            GetModuleInformation,
+            process,
+            module,
+            module_info,
+            module_info_size
+        )
+        .map_err(Error::GetModuleInformationFailed)?;
     }
 
     Ok(unsafe { module_info.assume_init() })
@@ -100,20 +103,16 @@ impl Finder {
         let module_info = get_module_info(module_name)?;
 
         let start = module_info.lpBaseOfDll as usize;
-        
-        let size = try_int_cast!(module_info.SizeOfImage, usize,
-            "size of module")?;
-        
+
+        let size = try_int_cast!(module_info.SizeOfImage, usize, "size of module")?;
+
         let end = start
             .checked_add(size)
             .ok_or(Error::OverflowEndOfModule { start, size })?;
-        
+
         info!("[{:#x}, {:#x}) is {:#x} bytes.", start, end, size);
-        
-        Ok(Self {
-            start,
-            end,
-        })
+
+        Ok(Self { start, end })
     }
 
     fn is_match(address: usize, pattern: &[Byte]) -> bool {
@@ -127,7 +126,9 @@ impl Finder {
     }
 
     pub fn find(&self, pattern: &[Byte]) -> Result<Option<usize>, Error> {
-        let end = self.end.checked_sub(pattern.len())
+        let end = self
+            .end
+            .checked_sub(pattern.len())
             .ok_or(Error::OverflowSearchSpaceEnd {
                 end: self.end,
                 pattern_length: pattern.len(),

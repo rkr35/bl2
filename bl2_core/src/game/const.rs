@@ -1,5 +1,5 @@
+use super::{FString, Field};
 use core::ops::{Deref, DerefMut};
-use super::{Field, FString};
 
 #[repr(C)]
 pub struct Const<'a> {

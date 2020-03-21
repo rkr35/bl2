@@ -1,5 +1,5 @@
-use core::ops::{Deref, DerefMut};
 use super::Field;
+use core::ops::{Deref, DerefMut};
 
 #[repr(C)]
 pub struct Struct<'a> {

@@ -22,28 +22,41 @@ pub enum Error {
         #[from]
         source: pattern::Error,
     },
-    
+
     #[error("Io error: {source}")]
     Io {
         #[from]
         source: io::Error,
-    }
+    },
 }
 
 pub type Names<'n> = Array<'n, Option<&'n Entry>>;
 type Objects<'o> = Array<'o, Option<&'o mut Object<'o>>>;
 
 const NAMES_PATTERN: &[Byte] = &[
-    Byte::Literal(0x8B), Byte::Literal(0x0D),
-    Byte::Wildcard, Byte::Wildcard, Byte::Wildcard, Byte::Wildcard,
-    Byte::Literal(0x83), Byte::Literal(0x3C), Byte::Literal(0x81),
+    Byte::Literal(0x8B),
+    Byte::Literal(0x0D),
+    Byte::Wildcard,
+    Byte::Wildcard,
+    Byte::Wildcard,
+    Byte::Wildcard,
+    Byte::Literal(0x83),
+    Byte::Literal(0x3C),
+    Byte::Literal(0x81),
 ];
 
 const OBJECTS_PATTERN: &[Byte] = &[
-    Byte::Literal(0x8B), Byte::Literal(0x0D),
-    Byte::Wildcard, Byte::Wildcard, Byte::Wildcard, Byte::Wildcard,
-    Byte::Literal(0x8B), Byte::Literal(0x3C), Byte::Literal(0x81),
-    Byte::Literal(0x8B), Byte::Literal(0xB5),
+    Byte::Literal(0x8B),
+    Byte::Literal(0x0D),
+    Byte::Wildcard,
+    Byte::Wildcard,
+    Byte::Wildcard,
+    Byte::Wildcard,
+    Byte::Literal(0x8B),
+    Byte::Literal(0x3C),
+    Byte::Literal(0x81),
+    Byte::Literal(0x8B),
+    Byte::Literal(0xB5),
 ];
 
 pub struct Globals {
@@ -54,8 +67,7 @@ pub struct Globals {
 impl Globals {
     pub fn new() -> Result<Self, Error> {
         fn get_mov_src_operand(mov_instruction_address: usize) -> usize {
-            let src_operand_address = (mov_instruction_address + 2)
-                as *const usize;
+            let src_operand_address = (mov_instruction_address + 2) as *const usize;
             unsafe { *src_operand_address }
         }
 
@@ -66,7 +78,7 @@ impl Globals {
             .map(get_mov_src_operand)
             .and_then(|address| unsafe { (address as *const Names).as_ref() })
             .ok_or(Error::NamesNotFound)?;
-    
+
         let objects = finder
             .find(OBJECTS_PATTERN)?
             .map(get_mov_src_operand)
@@ -77,22 +89,26 @@ impl Globals {
     }
 
     fn dump_names(&self, output: &Path) -> Result<(), Error> {
-        info!("Creating file {}", 
-            output.file_name()
-            .and_then(OsStr::to_str)
-            .unwrap_or("BAD FILE NAME"));
-        
+        info!(
+            "Creating file {}",
+            output
+                .file_name()
+                .and_then(OsStr::to_str)
+                .unwrap_or("BAD FILE NAME")
+        );
+
         let mut file = File::create(output).map(BufWriter::new)?;
-        
-        writeln!(&mut file, "Global names address: {:#x}",
-            self.names as *const _ as usize)?;
-        
+
+        writeln!(
+            &mut file,
+            "Global names address: {:#x}",
+            self.names as *const _ as usize
+        )?;
+
         info!("Dumping names.");
         for (i, name) in self.names.iter().enumerate() {
             if let Some(name) = name {
-                let name = name
-                    .to_str()
-                    .unwrap_or("not a valid utf-8 string");
+                let name = name.to_str().unwrap_or("not a valid utf-8 string");
                 writeln!(&mut file, "[{}] {}", i, name)?;
             } else {
                 writeln!(&mut file, "[{}] !null!", i)?;
@@ -104,16 +120,22 @@ impl Globals {
     }
 
     fn dump_objects(&self, output: &Path) -> Result<(), Error> {
-        info!("Creating file {}", 
-            output.file_name()
-            .and_then(OsStr::to_str)
-            .unwrap_or("BAD FILE NAME"));
-        
+        info!(
+            "Creating file {}",
+            output
+                .file_name()
+                .and_then(OsStr::to_str)
+                .unwrap_or("BAD FILE NAME")
+        );
+
         let mut file = File::create(output).map(BufWriter::new)?;
-        
-        writeln!(&mut file, "Global objects address: {:#x}",
-            self.objects as *const _ as usize)?;
-        
+
+        writeln!(
+            &mut file,
+            "Global objects address: {:#x}",
+            self.objects as *const _ as usize
+        )?;
+
         info!("Dumping objects.");
         for (i, object) in self.objects.iter().enumerate() {
             if let Some(object) = object {
@@ -139,15 +161,16 @@ impl Globals {
         self.dump_objects(&output_directory.join("objects_dump.txt"))?;
         let elapsed = now.elapsed();
 
-        info!("It took {} seconds to dump global objects.",
-            elapsed.as_secs_f64());
-            
+        info!(
+            "It took {} seconds to dump global objects.",
+            elapsed.as_secs_f64()
+        );
+
         Ok(())
     }
 
     pub fn non_null_objects_iter(&self) -> impl Iterator<Item = &Object> {
-        self
-            .objects
+        self.objects
             .iter()
             .filter_map(|o| o.as_ref())
             // Reinterpret &&mut T as &T. Sits better with borrowck if we don't

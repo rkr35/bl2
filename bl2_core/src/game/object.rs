@@ -1,9 +1,9 @@
+use super::Struct;
+use crate::game::{Entry, Name};
+use crate::globals::Names;
 use core::hash::{Hash, Hasher};
 use core::iter;
 use core::ptr;
-use crate::game::{Entry, Name};
-use crate::globals::Names;
-use super::Struct;
 
 /*
 class UObject
@@ -44,20 +44,15 @@ impl<'a> Object<'a> {
 
     pub fn full_name<'n>(&self, global_names: &'n Names) -> Option<String> {
         let outers = {
-            let v: Option<Vec<_>> = self
-                .outer_iter()
-                .map(|o| o.name(global_names))
-                .collect();
+            let v: Option<Vec<_>> = self.outer_iter().map(|o| o.name(global_names)).collect();
 
             let mut v = v?;
             v.reverse();
             v.join(".")
         };
 
-        let class = self
-            .class
-            .and_then(|c| c.name(global_names))?;
-            
+        let class = self.class.and_then(|c| c.name(global_names))?;
+
         let self_name = self.name(global_names)?;
 
         let full_name = if outers.is_empty() {
@@ -68,7 +63,7 @@ impl<'a> Object<'a> {
 
         Some(full_name)
     }
-    
+
     pub fn package(&self) -> Option<&Object> {
         self.outer_iter().last()
     }

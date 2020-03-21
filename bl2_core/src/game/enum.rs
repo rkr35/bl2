@@ -1,6 +1,6 @@
-use core::ops::{Deref, DerefMut};
-use crate::globals::Names;
 use super::{Array, Field, Name};
+use crate::globals::Names;
+use core::ops::{Deref, DerefMut};
 
 #[repr(C)]
 pub struct Enum<'a> {
@@ -9,15 +9,10 @@ pub struct Enum<'a> {
 }
 
 impl<'a> Enum<'a> {
-    pub fn variants<'n>(&self, global_names: &'n Names)
-        -> Option<Vec<&'n str>> {
-        self
-            .variants
+    pub fn variants<'n>(&self, global_names: &'n Names) -> Option<Vec<&'n str>> {
+        self.variants
             .iter()
-            .map(|n| n
-                .entry(global_names)
-                .and_then(|entry| entry.to_str().ok())
-            )
+            .map(|n| n.entry(global_names).and_then(|entry| entry.to_str().ok()))
             .collect()
     }
 }

@@ -69,7 +69,7 @@ macro_rules! wide_format {
         let needs_null_terminator = widened
             .last()
             .map_or(true, |last| *last != 0);
-            
+
         if needs_null_terminator {
             widened.push(0);
         }

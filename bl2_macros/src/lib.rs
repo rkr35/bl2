@@ -27,12 +27,12 @@ pub fn main(input: OldTokenStream) -> OldTokenStream {
                     wincon::FreeConsole,
                 }
             };
-            
+
             let result = panic::catch_unwind(|| {
                 unsafe {
                     AllocConsole();
                 }
-                
+
                 println!("Allocated console.");
 
                 let filter = LevelFilter::Info;
@@ -57,7 +57,7 @@ pub fn main(input: OldTokenStream) -> OldTokenStream {
                 FreeConsole();
                 FreeLibraryAndExitThread(dll.cast(), 0);
             }
-        
+
             0
         }
 
@@ -70,7 +70,7 @@ pub fn main(input: OldTokenStream) -> OldTokenStream {
             use core::ptr::null_mut;
             use winapi::{
                 um::{
-                    libloaderapi::DisableThreadLibraryCalls, 
+                    libloaderapi::DisableThreadLibraryCalls,
                     processthreadsapi::CreateThread,
                     winnt::DLL_PROCESS_ATTACH,
                     winuser::{MB_OK, MessageBoxW},
@@ -85,12 +85,12 @@ pub fn main(input: OldTokenStream) -> OldTokenStream {
 
             if let Err(error_code) = api_result {
                 use wchar::wch_c as w;
-                
+
                 let hwnd = null_mut();
-                
+
                 let text = wide_format!("DisableThreadLibraryCalls() failed. \
                     GetLastError = {:#x}", error_code);
-                    
+
                 let caption = w!("Error");
 
                 unsafe { MessageBoxW(hwnd, text.as_ptr(), caption.as_ptr(),
@@ -100,7 +100,7 @@ pub fn main(input: OldTokenStream) -> OldTokenStream {
             } else {
                 unsafe { CreateThread(null_mut(), 0, Some(on_attach),
                     dll.cast(), 0, null_mut()) };
-                    
+
                 TRUE
             }
         }

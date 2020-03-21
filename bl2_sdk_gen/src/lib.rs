@@ -4,8 +4,7 @@ use bl2_core::{
 };
 use bl2_macros::main;
 use log::{error, info};
-use std::collections::{HashMap};
-
+use std::collections::HashMap;
 
 use thiserror::Error;
 
@@ -30,7 +29,7 @@ enum Error {
     UnableToFindStaticClasses {
         #[from]
         source: static_classes::Error,
-    }
+    },
 }
 
 fn process_packages(_config: &Config, globals: &Globals) -> Result<(), Error> {
@@ -43,7 +42,11 @@ fn process_packages(_config: &Config, globals: &Globals) -> Result<(), Error> {
     // try_cast<Enum>(object, static_classes.enumeration)
     for object in globals.non_null_objects_iter() {
         if let Some(package) = object.package() {
-            macro_rules! pkg { () => { packages.entry(package).or_default() } }
+            macro_rules! pkg {
+                () => {
+                    packages.entry(package).or_default()
+                };
+            }
 
             if object.is(static_classes.enumeration) {
                 let e = Enumeration::from(unsafe { cast::<Enum>(object) }, globals);
@@ -51,8 +54,7 @@ fn process_packages(_config: &Config, globals: &Globals) -> Result<(), Error> {
                     pkg!().enums.push(e);
                 }
             } else if object.is(static_classes.constant) {
-                let c = Constant::from(unsafe { cast::<Const>(object) },
-                    globals);
+                let c = Constant::from(unsafe { cast::<Const>(object) }, globals);
 
                 if let Some(c) = c {
                     pkg!().consts.push(c);
@@ -61,7 +63,6 @@ fn process_packages(_config: &Config, globals: &Globals) -> Result<(), Error> {
             }
         }
     }
-
 
     Ok(())
 }
