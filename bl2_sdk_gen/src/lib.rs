@@ -30,13 +30,15 @@ enum Error {
         #[from]
         source: static_classes::Error,
     },
+
+    #[error("Unable to find outer class for {0:#x}")]
+    UnableToFindOuter(usize),
 }
 
 fn process_packages(_config: &Config, globals: &Globals) -> Result<(), Error> {
     info!("Looking for static_classes.");
     let static_classes = StaticClasses::new(globals)?;
     info!("Found static_classes.");
-    let _processed_objects = HashMap::<&Object, bool>::new();
     let mut packages = HashMap::<&Object, Package>::new();
 
     // try_cast<Enum>(object, static_classes.enumeration)
@@ -48,18 +50,33 @@ fn process_packages(_config: &Config, globals: &Globals) -> Result<(), Error> {
                 };
             }
 
+            macro_rules! outer {
+                () => {
+                    object.outer.ok_or(Error::UnableToFindOuter(object as *const _ as usize))?
+                };
+            }
+
+            macro_rules! pkg_outer {
+                () => {
+                    pkg!().subpackages.entry(outer!()).or_default()
+                }
+            }
+
             if object.is(static_classes.enumeration) {
                 let e = Enumeration::from(unsafe { cast::<Enum>(object) }, globals);
                 if let Some(e) = e {
-                    pkg!().enums.push(e);
+                    pkg_outer!().enums.push(e);
                 }
             } else if object.is(static_classes.constant) {
                 let c = Constant::from(unsafe { cast::<Const>(object) }, globals);
-
                 if let Some(c) = c {
-                    pkg!().consts.push(c);
+                    pkg_outer!().consts.push(c);               
                 }
             } else if object.is(static_classes.class) {
+                let cl = Class::from(unsafe { cast::<Class>(object) }, globals);
+                if let Some(cl) = cl {
+                    
+                }
             }
         }
     }

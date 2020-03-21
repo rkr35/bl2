@@ -27,7 +27,7 @@ pub struct Object<'a> {
     pad0: [u8; 0x1c],
     index: u32,
     pad1: [u8; 0x4],
-    outer: Option<&'a Object<'a>>,
+    pub outer: Option<&'a Object<'a>>,
     name: Name,
     class: Option<&'a Struct<'a>>,
     pad2: [u8; 0x4],
