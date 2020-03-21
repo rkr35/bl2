@@ -4,9 +4,9 @@ use bl2_core::{
 };
 use bl2_macros::main;
 use log::{error, info};
-use std::collections::{HashMap, hash_map::Entry, HashSet};
-use std::ffi::OsString;
-use std::path::Path;
+use std::collections::{HashMap};
+
+
 use thiserror::Error;
 
 mod config;
@@ -37,7 +37,7 @@ fn process_packages(_config: &Config, globals: &Globals) -> Result<(), Error> {
     info!("Looking for static_classes.");
     let static_classes = StaticClasses::new(globals)?;
     info!("Found static_classes.");
-    let mut processed_objects = HashMap::<&Object, bool>::new();
+    let _processed_objects = HashMap::<&Object, bool>::new();
     let mut packages = HashMap::<&Object, Package>::new();
 
     // try_cast<Enum>(object, static_classes.enumeration)

@@ -44,7 +44,7 @@ impl<'a> Object<'a> {
 
     pub fn full_name<'n>(&self, global_names: &'n Names) -> Option<String> {
         let outers = {
-            let mut v: Option<Vec<_>> = self
+            let v: Option<Vec<_>> = self
                 .outer_iter()
                 .map(|o| o.name(global_names))
                 .collect();
