@@ -118,7 +118,9 @@ impl Globals {
         for (i, object) in self.objects.iter().enumerate() {
             if let Some(object) = object {
                 let address = object as *const _ as usize;
-                let name = object.full_name(self.names);
+                let name = object
+                    .full_name(self.names)
+                    .unwrap_or("BAD FULL NAME".to_string());
                 writeln!(&mut file, "[{}] {} {:#x}", i, name, address)?;
             } else {
                 writeln!(&mut file, "[{}] !null!", i)?;

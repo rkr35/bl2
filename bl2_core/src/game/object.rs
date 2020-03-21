@@ -42,30 +42,31 @@ impl<'a> Object<'a> {
         self.name.entry(global_names)
     }
 
-    pub fn full_name<'n>(&self, global_names: &'n Names) -> String {
+    pub fn full_name<'n>(&self, global_names: &'n Names) -> Option<String> {
         let outers = {
-            let mut v: Vec<_> = self
+            let mut v: Option<Vec<_>> = self
                 .outer_iter()
-                .map(|o| o.name(global_names).unwrap_or("!OUTER_UNKNOWN!"))
+                .map(|o| o.name(global_names))
                 .collect();
+
+            let mut v = v?;
             v.reverse();
             v.join(".")
         };
 
         let class = self
             .class
-            .and_then(|c| c.name(global_names))
-            .unwrap_or("!CLASS_UNKNOWN!");
+            .and_then(|c| c.name(global_names))?;
             
-        let self_name = self
-            .name(global_names)
-            .unwrap_or("!SELF_UNKNOWN!");
+        let self_name = self.name(global_names)?;
 
-        if outers.is_empty() {
+        let full_name = if outers.is_empty() {
             format!("{} {}", class, self_name)
         } else {
             format!("{} {}.{}", class, outers, self_name)
-        }
+        };
+
+        Some(full_name)
     }
     
     pub fn package(&self) -> Option<&Object> {
