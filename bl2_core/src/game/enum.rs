@@ -10,16 +10,13 @@ pub struct Enum<'a> {
 
 impl<'a> Enum<'a> {
     pub fn variants<'n>(&self, global_names: &'n Names)
-        -> Vec<&'n str> {
+        -> Option<Vec<&'n str>> {
         self
             .variants
             .iter()
             .map(|n| n
                 .entry(global_names)
-                .map_or(
-                    "UNKNOWN VARIANT NAME",
-                    |e| e.to_str().unwrap_or("NON UTF-8 VARIANT NAME")
-                )
+                .and_then(|entry| entry.to_str().ok())
             )
             .collect()
     }
