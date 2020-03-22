@@ -1,6 +1,15 @@
 mod array;
 pub use array::Array;
 
+mod class;
+pub use class::Class;
+
+mod r#const;
+pub use r#const::Const;
+
+mod r#enum;
+pub use r#enum::Enum;
+
 mod field;
 pub use field::Field;
 
@@ -12,15 +21,6 @@ pub use name::{Entry, Name};
 
 mod object;
 pub use object::Object;
-
-mod class;
-pub use class::Class;
-
-mod r#const;
-pub use r#const::Const;
-
-mod r#enum;
-pub use r#enum::Enum;
 
 mod r#struct;
 pub use r#struct::Struct;
