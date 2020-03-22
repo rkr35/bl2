@@ -1,16 +1,16 @@
-use super::{Object, Struct};
+use super::{Object, Property, Struct};
 use core::ops::{Deref, DerefMut};
 
 #[repr(C)]
 pub struct Class<'a> {
-    r#struct: Struct<'a>,
+    r#struct: Struct<'a, Property<'a>>,
     pad0: [u8; 0x60],
     class_default_object: Option<&'a Object<'a>>,
     pad1: [u8; 0x5C],
 }
 
 impl<'a> Deref for Class<'a> {
-    type Target = Struct<'a>;
+    type Target = Struct<'a, Property<'a>>;
 
     fn deref(&self) -> &Self::Target {
         &self.r#struct
