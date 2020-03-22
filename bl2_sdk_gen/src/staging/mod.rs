@@ -3,8 +3,8 @@ use bl2_core::game::Object;
 mod constant;
 pub use constant::Constant;
 
-mod enumeration;
-pub use enumeration::Enumeration;
+mod class;
+pub use class::Class;
 
 use std::collections::HashMap;
 

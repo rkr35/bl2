@@ -13,6 +13,9 @@ pub use name::{Entry, Name};
 mod object;
 pub use object::Object;
 
+mod class;
+pub use class::Class;
+
 mod r#const;
 pub use r#const::Const;
 
