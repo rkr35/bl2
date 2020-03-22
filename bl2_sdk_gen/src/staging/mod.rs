@@ -1,7 +1,10 @@
 use bl2_core::game::Object;
 
-mod constant;
-pub use constant::Constant;
+mod r#const;
+pub use r#const::Const;
+
+mod r#enum;
+pub use r#enum::Enum;
 
 mod class;
 pub use class::Class;
@@ -15,6 +18,6 @@ pub struct Package<'a> {
 
 #[derive(Default)]
 pub struct SubPackage<'a> {
-    pub enums: Vec<Enumeration<'a>>,
-    pub consts: Vec<Constant<'a>>,
+    pub enums: Vec<Enum<'a>>,
+    pub consts: Vec<Const<'a>>,
 }

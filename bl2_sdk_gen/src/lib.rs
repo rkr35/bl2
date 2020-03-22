@@ -1,5 +1,5 @@
 use bl2_core::{
-    game::{cast, Const, Enum, Object},
+    game::{cast, Class, Const, Enum, Object},
     globals::{self, Globals},
 };
 use bl2_macros::main;
@@ -15,7 +15,6 @@ mod static_classes;
 use static_classes::StaticClasses;
 
 mod staging;
-use staging::{Constant, Enumeration, Package};
 
 #[derive(Error, Debug)]
 enum Error {
@@ -39,7 +38,7 @@ fn process_packages(_config: &Config, globals: &Globals) -> Result<(), Error> {
     info!("Looking for static_classes.");
     let static_classes = StaticClasses::new(globals)?;
     info!("Found static_classes.");
-    let mut packages = HashMap::<&Object, Package>::new();
+    let mut packages = HashMap::<&Object, staging::Package>::new();
 
     // try_cast<Enum>(object, static_classes.enumeration)
     for object in globals.non_null_objects_iter() {
@@ -63,19 +62,19 @@ fn process_packages(_config: &Config, globals: &Globals) -> Result<(), Error> {
             }
 
             if object.is(static_classes.enumeration) {
-                let e = Enumeration::from(unsafe { cast::<Enum>(object) }, globals);
+                let e = staging::Enum::from(unsafe { cast::<Enum>(object) }, globals);
                 if let Some(e) = e {
                     pkg_outer!().enums.push(e);
                 }
             } else if object.is(static_classes.constant) {
-                let c = Constant::from(unsafe { cast::<Const>(object) }, globals);
+                let c = staging::Const::from(unsafe { cast::<Const>(object) }, globals);
                 if let Some(c) = c {
                     pkg_outer!().consts.push(c);               
                 }
             } else if object.is(static_classes.class) {
-                let cl = Class::from(unsafe { cast::<Class>(object) }, globals);
+                let cl = staging::Class::from(unsafe { cast::<Class>(object) }, globals);
                 if let Some(cl) = cl {
-                    
+
                 }
             }
         }
