@@ -40,7 +40,6 @@ fn process_packages(_config: &Config, globals: &Globals) -> Result<(), Error> {
     info!("Found static_classes.");
     let mut packages = HashMap::<&Object, staging::Package>::new();
 
-    // try_cast<Enum>(object, static_classes.enumeration)
     for object in globals.non_null_objects_iter() {
         if let Some(package) = object.package() {
             macro_rules! pkg {
