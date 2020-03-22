@@ -22,6 +22,9 @@ pub use name::{Entry, Name};
 mod object;
 pub use object::Object;
 
+mod property;
+pub use property::Property;
+
 mod r#struct;
 pub use r#struct::Struct;
 
