@@ -4,7 +4,7 @@ use core::ops::{Deref, DerefMut};
 #[repr(C)]
 pub struct Struct<'a> {
     field: Field<'a>,
-    pad0: u64,
+    pad0: [u8; 8],
     pub super_field: Option<&'a Struct<'a>>,
     pub children: Option<&'a Field<'a>>,
     pub property_size: u16,
