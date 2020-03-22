@@ -5,16 +5,15 @@ use bl2_core::{
 use bl2_macros::main;
 use log::{error, info};
 use std::collections::HashMap;
-
 use thiserror::Error;
 
 mod config;
 use config::Config;
 
+mod staging;
+
 mod static_classes;
 use static_classes::StaticClasses;
-
-mod staging;
 
 #[derive(Error, Debug)]
 enum Error {
@@ -60,20 +59,20 @@ fn process_packages(_config: &Config, globals: &Globals) -> Result<(), Error> {
                 }
             }
 
-            if object.is(static_classes.enumeration) {
-                let e = staging::Enum::from(unsafe { cast::<Enum>(object) }, globals);
-                if let Some(e) = e {
-                    pkg_outer!().enums.push(e);
+            if object.is(static_classes.class) {
+                let cl = staging::Class::from(unsafe { cast::<Class>(object) }, globals);
+                if let Some(cl) = cl {
+
                 }
             } else if object.is(static_classes.constant) {
                 let c = staging::Const::from(unsafe { cast::<Const>(object) }, globals);
                 if let Some(c) = c {
                     pkg_outer!().consts.push(c);               
                 }
-            } else if object.is(static_classes.class) {
-                let cl = staging::Class::from(unsafe { cast::<Class>(object) }, globals);
-                if let Some(cl) = cl {
-
+            } else if object.is(static_classes.enumeration) {
+                let e = staging::Enum::from(unsafe { cast::<Enum>(object) }, globals);
+                if let Some(e) = e {
+                    pkg_outer!().enums.push(e);
                 }
             }
         }
