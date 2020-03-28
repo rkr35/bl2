@@ -14,6 +14,7 @@ pub struct StaticClasses<'a> {
     pub class: &'a Object<'a>,
     pub script_struct: &'a Object<'a>,
     pub function: &'a Object<'a>,
+    pub bool_property: &'a Object<'a>,
 }
 
 impl<'a> StaticClasses<'a> {
@@ -36,6 +37,7 @@ impl<'a> StaticClasses<'a> {
             class: find("Class Core.Class")?,
             script_struct: find("Class Core.ScriptStruct")?,
             function: find("Class Core.Function")?,
+            bool_property: find("Class Core.BoolProperty")?,
         })
     }
 }

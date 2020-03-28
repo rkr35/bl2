@@ -1,8 +1,10 @@
 use bl2_core::{
-    game::{cast, Class as GameClass, Field, Property, Struct},
+    game::{BoolProperty, cast, Class as GameClass, Field, Object, Property,
+        Struct},
     globals::Globals,
 };
 
+use core::cmp::Ordering;
 use core::convert::TryInto;
 use core::iter;
 use crate::StaticClasses;
@@ -46,7 +48,11 @@ impl<'a> Class<'a> {
             return Err(Error::DefaultClass);
         }
 
-        let maybe_parent: Option<&Struct> = class
+        let full_name = class
+            .full_name(globals.names)
+            .ok_or(Error::UnableToGenerateFullName)?;
+
+        let maybe_parent = class
             .super_field
             .filter(|parent| parent.ne(class));
 
@@ -58,18 +64,37 @@ impl<'a> Class<'a> {
             |c| c.next.map(|f| unsafe { cast::<Property>(f) })
         );
 
-        let children = children
-            .filter(|c| c.element_size > 0)
-            .filter(|c| !c.is(static_classes.script_struct))
-            .filter(|c| !c.is(static_classes.function))
-            .filter(|c| !c.is(static_classes.enumeration))
-            .filter(|c| !c.is(static_classes.constant))
-            .filter(|c| c.offset >= inherited_size)
-            ;
+        let children = {
+            let mut c: Vec<_> = children
+                .filter(|c| c.element_size > 0)
+                .filter(|c| !c.is(static_classes.script_struct))
+                .filter(|c| !c.is(static_classes.function))
+                .filter(|c| !c.is(static_classes.enumeration))
+                .filter(|c| !c.is(static_classes.constant))
+                .filter(|c| c.offset >= inherited_size)
+                .collect();
 
-        let full_name = class
-            .full_name(globals.names)
-            .ok_or(Error::UnableToGenerateFullName)?;
+            c.sort_by(|p, q|
+                p
+                    .offset
+                    .cmp(&q.offset)
+                    .then_with(|| {
+                        let to_bool = {
+                            type O<'a> = &'a Object<'a>;
+                            let is = |r: O| r.is(static_classes.bool_property);
+                            let to = |r| unsafe { cast::<BoolProperty>(r) };
+                            move |r| if is(r) { Some(to(r)) } else { None }
+                        };
+
+                        match [to_bool(p), to_bool(q)] {
+                            [Some(p), Some(q)] => p.bitmask.cmp(&q.bitmask),
+                            _ => Ordering::Equal,
+                        }
+                    })
+            );
+
+            c
+        };
 
         let inherited_size = inherited_size
             .try_into()

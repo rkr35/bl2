@@ -4,7 +4,7 @@ use core::ops::{Deref, DerefMut};
 #[repr(C)]
 pub struct BoolProperty<'a> {
     property: Property<'a>,
-    bitmask: u32,
+    pub bitmask: u32,
 }
 
 impl<'a> Deref for BoolProperty<'a> {
