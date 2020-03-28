@@ -4,7 +4,7 @@ use core::ops::{Deref, DerefMut};
 #[repr(C)]
 pub struct Field<'a> {
     object: Object<'a>,
-    next: Option<&'a Field<'a>>,
+    pub next: Option<&'a Field<'a>>,
 }
 
 impl<'a> Deref for Field<'a> {

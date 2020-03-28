@@ -13,7 +13,7 @@ use config::Config;
 mod staging;
 
 mod static_classes;
-use static_classes::StaticClasses;
+pub use static_classes::StaticClasses;
 
 #[derive(Error, Debug)]
 enum Error {
@@ -60,10 +60,20 @@ fn process_packages(_config: &Config, globals: &Globals) -> Result<(), Error> {
             }
 
             if object.is(static_classes.class) {
-                let cl = staging::Class::from(unsafe { cast::<Class>(object) }, globals);
-                if let Some(cl) = cl {
+                let cl = staging::Class::from(
+                    unsafe { cast::<Class>(object) },
+                    globals,
+                    &static_classes
+                );
+                
+                match cl {
+                    Ok(cl) => (),
+                    Err(e) => {
+                        let address = object as *const _ as usize;
+                        error!("{:#x} class error: {}", address, e);
+                    }
+                };
 
-                }
             } else if object.is(static_classes.constant) {
                 let c = staging::Const::from(unsafe { cast::<Const>(object) }, globals);
                 if let Some(c) = c {

@@ -13,6 +13,7 @@ pub struct StaticClasses<'a> {
     pub constant: &'a Object<'a>,
     pub class: &'a Object<'a>,
     pub script_struct: &'a Object<'a>,
+    pub function: &'a Object<'a>,
 }
 
 impl<'a> StaticClasses<'a> {
@@ -34,6 +35,7 @@ impl<'a> StaticClasses<'a> {
             constant: find("Class Core.Const")?,
             class: find("Class Core.Class")?,
             script_struct: find("Class Core.ScriptStruct")?,
+            function: find("Class Core.Function")?,
         })
     }
 }

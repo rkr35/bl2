@@ -5,12 +5,12 @@ use core::ops::{Deref, DerefMut};
 pub struct Property<'a> {
     field: Field<'a>,
     array_dim: u32,
-    element_size: u32,
+    pub element_size: u32,
     property_flags: u64,
     property_size: u16,
     pad0: [u8; 0xE],
-    offset: u32,
-    next: Option<&'a Property<'a>>,
+    pub offset: u32,
+    next_link: Option<&'a Property<'a>>,
     pad1: [u8; 0x18],
 }
 
