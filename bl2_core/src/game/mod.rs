@@ -28,6 +28,9 @@ pub use fstring::FString;
 mod function;
 pub use function::Function;
 
+mod interface_property;
+pub use interface_property::InterfaceProperty;
+
 mod name;
 pub use name::{Entry, Name};
 
