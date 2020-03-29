@@ -34,6 +34,9 @@ pub use function::Function;
 mod interface_property;
 pub use interface_property::InterfaceProperty;
 
+mod map_property;
+pub use map_property::MapProperty;
+
 mod name;
 pub use name::{Entry, Name};
 
