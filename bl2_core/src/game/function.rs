@@ -8,8 +8,13 @@ pub struct Function<'a> {
     native: u16,
     rep_offset: u16,
     friendly_name: Name,
-    pad0: [u8; 0x10],
+    operator_precedence: u8,
+    num_params: u8,
+    params_size: u16,
+    ret_value_offset: u16,
+    pad0: [u8; 6],
     func: Option<&'a Void>,
+    pad1: [u8; 4],
 }
 
 impl<'a> Deref for Function<'a> {
