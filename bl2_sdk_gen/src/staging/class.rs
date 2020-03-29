@@ -25,8 +25,8 @@ pub enum Error {
 pub struct Class<'a> {
     pub name: &'a str,
     pub full_name: String,
-    pub size: usize,
-    pub inherited_size: usize,
+    pub size: u32,
+    pub inherited_size: u32,
     pub parent: Option<&'a Struct<'a>>,
 }
 
