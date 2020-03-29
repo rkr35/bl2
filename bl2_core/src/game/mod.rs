@@ -22,6 +22,9 @@ pub use field::Field;
 mod fstring;
 pub use fstring::FString;
 
+mod function;
+pub use function::Function;
+
 mod name;
 pub use name::{Entry, Name};
 
