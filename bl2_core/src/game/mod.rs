@@ -49,6 +49,9 @@ pub use script_struct::ScriptStruct;
 mod r#struct;
 pub use r#struct::Struct;
 
+mod struct_property;
+pub use struct_property::StructProperty;
+
 pub unsafe fn cast<'a, To>(object: &'a Object<'a>) -> &'a To {
     &*(object as *const Object as *const To)
 }
