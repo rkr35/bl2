@@ -10,6 +10,9 @@ pub use bool_property::BoolProperty;
 mod class;
 pub use class::Class;
 
+mod class_property;
+pub use class_property::ClassProperty;
+
 mod r#const;
 pub use r#const::Const;
 
