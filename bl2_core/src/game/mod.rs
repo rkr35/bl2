@@ -31,6 +31,9 @@ pub use name::{Entry, Name};
 mod object;
 pub use object::Object;
 
+mod object_property;
+pub use object_property::ObjectProperty;
+
 mod property;
 pub use property::Property;
 
