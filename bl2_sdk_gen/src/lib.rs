@@ -24,7 +24,7 @@ enum Error {
     },
 
     #[error("Static classes error: {source}")]
-    UnableToFindStaticClasses {
+    StaticClass {
         #[from]
         source: static_classes::Error,
     },
