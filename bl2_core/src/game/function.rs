@@ -2,6 +2,7 @@ use super::{Name, Struct};
 use core::ffi::c_void as Void;
 use core::ops::{Deref, DerefMut};
 
+#[repr(C)]
 pub struct Function<'a> {
     r#struct: Struct<'a>,
     flags: u32,

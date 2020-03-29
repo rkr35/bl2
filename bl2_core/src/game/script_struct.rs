@@ -1,6 +1,7 @@
 use super::Struct;
 use core::ops::{Deref, DerefMut};
 
+#[repr(C)]
 pub struct ScriptStruct<'a> {
     r#struct: Struct<'a>,
     pad0: [u8; 0x1c],
