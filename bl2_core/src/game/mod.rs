@@ -19,6 +19,9 @@ pub use class_property::ClassProperty;
 mod r#const;
 pub use r#const::Const;
 
+mod delegate_property;
+pub use delegate_property::DelegateProperty;
+
 mod r#enum;
 pub use r#enum::Enum;
 
