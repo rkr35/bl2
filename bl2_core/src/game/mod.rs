@@ -1,6 +1,9 @@
 mod array;
 pub use array::Array;
 
+mod array_property;
+pub use array_property::ArrayProperty;
+
 mod byte_property;
 pub use byte_property::ByteProperty;
 
