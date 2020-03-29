@@ -34,6 +34,9 @@ pub use object::Object;
 mod property;
 pub use property::Property;
 
+mod script_struct;
+pub use script_struct::ScriptStruct;
+
 mod r#struct;
 pub use r#struct::Struct;
 
