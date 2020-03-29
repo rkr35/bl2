@@ -18,11 +18,8 @@ pub enum Error {
     #[error("Unable to generate full name.")]
     UnableToGenerateFullName,
 
-    #[error("Encountered Default__ class.")]
-    DefaultClass,
-
-    #[error("Inherited size ({0}_u32) does not losslessly cast into usize.")]
-    InheritedSizeLossyCast(u32),
+    #[error("Encountered Default__ class \"{0}\".")]
+    DefaultClass(String),
 }
 
 pub struct Class<'a> {
@@ -45,7 +42,7 @@ impl<'a> Class<'a> {
             .ok_or(Error::UnableToGenerateName)?;
 
         if name.contains("Default__") {
-            return Err(Error::DefaultClass);
+            return Err(Error::DefaultClass(name.to_owned()));
         }
 
         let full_name = class
