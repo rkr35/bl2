@@ -4,9 +4,9 @@ use core::ops::{Deref, DerefMut};
 #[repr(C)]
 pub struct Class<'a> {
     r#struct: Struct<'a, Property<'a>>,
-    pad0: [u8; 0x60],
+    pad0: [u8; 0xcc],
     class_default_object: Option<&'a Object<'a>>,
-    pad1: [u8; 0x5C],
+    pad1: [u8; 0x74],
 }
 
 impl<'a> Deref for Class<'a> {
@@ -22,3 +22,6 @@ impl<'a> DerefMut for Class<'a> {
         &mut self.r#struct
     }
 }
+
+
+// struct, 0x44, 0x60
