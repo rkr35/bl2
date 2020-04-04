@@ -15,6 +15,18 @@ pub struct StaticClasses<'a> {
     pub script_struct: &'a Object<'a>,
     pub function: &'a Object<'a>,
     pub bool_property: &'a Object<'a>,
+    pub byte_property: &'a Object<'a>,
+    pub int_property: &'a Object<'a>,
+    pub float_property: &'a Object<'a>,
+    pub object_property: &'a Object<'a>,
+    pub component_property: &'a Object<'a>,
+    pub class_property: &'a Object<'a>,
+    pub interface_property: &'a Object<'a>,
+    pub name_property: &'a Object<'a>,
+    pub struct_property: &'a Object<'a>,
+    pub string_property: &'a Object<'a>,
+    pub array_property: &'a Object<'a>,
+    pub map_property: &'a Object<'a>,
 }
 
 impl<'a> StaticClasses<'a> {
@@ -38,6 +50,18 @@ impl<'a> StaticClasses<'a> {
             script_struct: find("Class Core.ScriptStruct")?,
             function: find("Class Core.Function")?,
             bool_property: find("Class Core.BoolProperty")?,
+            byte_property: find("Class Core.ByteProperty")?,
+            int_property: find("Class Core.IntProperty")?,
+            float_property: find("Class Core.FloatProperty")?,
+            object_property: find("Class Core.ObjectProperty")?,
+            component_property: find("Class Core.ComponentProperty")?,
+            class_property: find("Class Core.ClassProperty")?,
+            interface_property: find("Class Core.InterfaceProperty")?,
+            name_property: find("Class Core.NameProperty")?,
+            struct_property: find("Class Core.StructProperty")?,
+            string_property: find("Class Core.StrProperty")?,
+            array_property: find("Class Core.ArrayProperty")?,
+            map_property: find("Class Core.MapProperty")?,
         })
     }
 }
