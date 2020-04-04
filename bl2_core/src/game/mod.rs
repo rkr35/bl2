@@ -61,6 +61,11 @@ pub use r#struct::Struct;
 mod struct_property;
 pub use struct_property::StructProperty;
 
+
+/// #Safety
+/// Only as safe as you make it. If `object` is not a valid `&T` then you have
+/// undefined behavior because this method will unconditionally cast `object` from 
+/// `&Object` to `&To`.
 pub unsafe fn cast<'a, To>(object: &'a Object<'a>) -> &'a To {
     &*(object as *const Object as *const To)
 }
