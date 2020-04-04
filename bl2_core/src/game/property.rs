@@ -4,7 +4,7 @@ use core::ops::{Deref, DerefMut};
 #[repr(C)]
 pub struct Property<'a> {
     field: Field<'a>,
-    array_dim: u32,
+    pub array_dim: u32,
     pub element_size: u32,
     property_flags: u64,
     property_size: u16,
