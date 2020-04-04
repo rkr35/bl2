@@ -52,6 +52,9 @@ pub use object_property::ObjectProperty;
 mod property;
 pub use property::Property;
 
+mod script_interface;
+pub use script_interface::ScriptInterface;
+
 mod script_struct;
 pub use script_struct::ScriptStruct;
 
